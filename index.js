@@ -10,7 +10,7 @@ function lua(data) {
 
   append(`
     local data = {}
-    local ratio = display.height / ${data.w}
+    local ratio = display.height / ${data.h}
 
     local g = display.newLayer()
     g:setContentSize(${data.w}, ${data.h})
