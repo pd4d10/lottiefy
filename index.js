@@ -32,8 +32,10 @@ ${id}:setAnchorPoint(cc.p(${x / w}, ${1 - y / h}))`
   }
 
   // Coordinate system
-  const convertY = y => {
+  const convertY = (y, id) => {
+    console.log(id)
     return data.h - y
+    // return y
   }
 
   //  Traverse layers recursively
@@ -41,9 +43,43 @@ ${id}:setAnchorPoint(cc.p(${x / w}, ${1 - y / h}))`
     if (!item.layers) {
       return
     }
+    const itemId = item.id
 
     for (let layer of item.layers) {
       append(`-- ${layer.nm}, ${layer.refId}`)
+
+      //   if (layer.shapes) {
+      //     for (let shape of layer.shapes) {
+      //       if (shape.ty === 'gr') {
+      //         for (let item of shape.it) {
+      //           if (item.ty === 'sh') {
+      //             if (item.ks.a) {
+      //             } else {
+      //               const { i, o, v } = item.ks.k
+      //               append(`local drawNode = cc.DrawNode:create(100)
+      //               ${itemId || 'g'}:addChild(drawNode)`)
+      //               // const data = []
+      //               for (let j = 0; j < v.length - 1; j++) {
+      //                 append(`
+      //                   drawNode:drawQuadBezier(
+      //                     cc.p(${v[j][0]}, ${v[j][1]}),
+      //                     cc.p(0, 0),
+      //                     cc.p(${v[j + 1][0]}, ${v[j + 1][1]}),
+      //                     100,
+      //                     cc.c4f(255, 255, 0, 255)
+      //                   )
+      //                 `)
+      //               }
+      //             }
+      //           }
+      //           // if (item.ty === 'st') {
+      //           //   append(`cc.color4f(${item.c.k.map(x => 255 * x)})`)
+      //           // }
+      //         }
+      //       }
+      //     }
+      //   }
+
       const asset = assets[layer.refId]
 
       if (asset) {
@@ -73,22 +109,19 @@ ${id}:setAnchorPoint(cc.p(${x / w}, ${1 - y / h}))`
           if (layer.ks.p) {
             if (typeof layer.ks.p.k[0] === 'number') {
               const [x, y] = layer.ks.p.k
-              append(`${asset.id}:setPosition(cc.p(${x}, ${convertY(y)}))`)
+              append(`${asset.id}:setPosition(cc.p(${x}, ${item.id || 'g'}:getContentSize().height - ${y}))`)
               append(setAnchorPoint(asset.id, layer.ks.a.k, layer))
             } else if (layer.ks.p.k.length) {
               const [{ s, e }, { t }] = layer.ks.p.k
-              append(
-                `local ${asset.id}_action = cc.Sequence:create({
-                  cc.CallFunc:create(function(el,data)
-                    el:setPosition(cc.p(${s[0]}, ${convertY(s[1])}))
-                    ${setAnchorPoint('el', layer.ks.a.k, layer)}
-                    el:setVisible(true)
-                    -- el:setCascadeOpacityEnabled(true)
-                    -- el:setOpacity(255)
-                  end),
-                  cc.MoveTo:create(${t / 40}, cc.p(${e[0]}, ${convertY(e[1])}))
-                })`
-              )
+              append(`
+                ${asset.id}:setPosition(cc.p(${s[0]}, ${item.id || 'g'}:getContentSize().height - ${s[1]}))
+                ${setAnchorPoint(asset.id, layer.ks.a.k, layer)}
+                -- el:setVisible(true)
+                -- el:setCascadeOpacityEnabled(true)
+                -- el:setOpacity(255)
+                local ${asset.id}_action = cc.Sequence:create({
+                  cc.MoveTo:create(${t / 30}, cc.p(${e[0]}, ${convertY(e[1])}))
+                })`)
               append(`table.insert(data, { node=${asset.id},action=${asset.id}_action })`)
             }
           }
