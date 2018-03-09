@@ -7,7 +7,7 @@ export default [
     output: {
       file: 'dist/lottie-cocos.js',
       format: 'iife',
+      name: 'lottie',
     },
-    // moduleName: 'lottie-cocos',
   },
 ]
