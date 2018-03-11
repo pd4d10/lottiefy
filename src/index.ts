@@ -11,10 +11,10 @@ export default function lottie(data: any, g: any) {
   // container.setAnchorPoint(0.5, 0.5)
 
   // container.setPosition(0, cc.winSize.height)
-  container.setPosition(500, 800)
+  container.setPosition(400, 2500)
   // window.g = globalLayer
   // container.setScale(cc.winSize.height / 1920)
-  container.setScale(0.3)
+  container.setScale(0.5)
   const containerId = 'xxxxx'
   layers[containerId] = container
   g.addChild(container)
@@ -35,27 +35,26 @@ export default function lottie(data: any, g: any) {
       y3: number
     ) {
       // console.log(arguments)
-      const node = new cc.DrawNode()
-      setTimeout(() => {
-        node.drawDots(
-          [cc.p(x0, y0), cc.p(x1, y1), cc.p(x2, y2), cc.p(x3, y3)],
-          10,
-          cc.color(255, 0, 0, 255)
-        )
-      }, ii * 1000)
-      ii++
-
-      node.drawCubicBezier(
-        cc.p(x0, y0),
-        cc.p(x1, y1),
-        cc.p(x2, y2),
-        cc.p(x3, y3),
-        100,
-        10,
-        cc.color('#ff0')
-      )
-      layers[id] = node
-      this.addChild(id, parentId)
+      // const node = new cc.DrawNode()
+      // setTimeout(() => {
+      //   node.drawDots(
+      //     [cc.p(x0, y0), cc.p(x1, y1), cc.p(x2, y2), cc.p(x3, y3)],
+      //     10,
+      //     cc.color(255, 0, 0, 255)
+      //   )
+      // }, ii * 1000)
+      // ii++
+      // node.drawCubicBezier(
+      //   cc.p(x0, y0),
+      //   cc.p(x1, y1),
+      //   cc.p(x2, y2),
+      //   cc.p(x3, y3),
+      //   100,
+      //   10,
+      //   cc.color('#ff0')
+      // )
+      // layers[id] = node
+      // this.addChild(id, parentId)
       // console.log(node)
     },
     createLayer(id) {
@@ -82,6 +81,9 @@ export default function lottie(data: any, g: any) {
     addChild(id, parentId, localZOrder) {
       // console.log(arguments)
       layers[parentId].addChild(layers[id], localZOrder)
+    },
+    getNode(id) {
+      return layers[id]
     },
   })
 }

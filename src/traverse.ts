@@ -36,7 +36,10 @@ interface Options {
   moveTo(id: string, parentId: string, time: number, x: number, y: number): any
   setContentSize(id: string, width: number, height: number): any
   addChild(id: string, parentId: string, localZOrder?: number): any
+  getNode(id: string): cc.Node
 }
+
+const getTime = (time: number) => 4 * time
 
 // type Asset =
 //   | {
@@ -198,6 +201,23 @@ export function traverse(data: any, containerId: string, options: Options) {
           if (layer.ks.o) {
           }
 
+          const parseK = (k: any[]) => {
+            console.log(k)
+            return k.reduceRight(
+              (result, item) => {
+                const { s, e, t } = item
+                if (s) {
+                  result.arr.unshift({ s, e, t: getTime((result.nextTime - t) / result.allTime) })
+                } else {
+                  result.allTime = t
+                }
+                result.nextTime = t
+                return result
+              },
+              { nextTime: null, allTime: null, arr: [] }
+            )
+          }
+
           // anchor
           if (layer.ks.a && layer.ks.a.k) {
             const [x, y] = layer.ks.a.k
@@ -213,9 +233,39 @@ export function traverse(data: any, containerId: string, options: Options) {
               var [x, y] = layer.ks.p.k
               options.setPosition(id, parentId, x, y)
             } else if (layer.ks.p.k.length) {
-              const [{ s, e }, { t }] = layer.ks.p.k
-              options.setPosition(id, parentId, s[0], s[1])
-              options.moveTo(id, parentId, t / 40, e[0], e[1])
+              let a: any = []
+              parseK(layer.ks.p.k).arr.forEach((x: any) => {
+                a.push(cc.moveTo(0, x.s[0], options.getNode(parentId).height - x.s[1]))
+                a.push(cc.moveTo(x.t, x.e[0], options.getNode(parentId).height - x.e[1]))
+              })
+              options.getNode(parentId).runAction(cc.sequence(a))
+            }
+          }
+
+          // rotation
+          if (layer.ks.r && layer.ks.r.k) {
+            if (typeof layer.ks.r.k[0] === 'number') {
+            } else {
+              let a: any = []
+              parseK(layer.ks.r.k).arr.forEach((x: any) => {
+                a.push(cc.rotateTo(0, x.s[0]))
+                a.push(cc.rotateTo(x.t, x.e[0]))
+              })
+              options.getNode(parentId).runAction(cc.sequence(a))
+            }
+          }
+
+          // scale
+          if (layer.ks.s) {
+            if (typeof layer.ks.s.k[0] === 'number') {
+            } else {
+              let a: any = []
+              parseK(layer.ks.s.k).arr.forEach((x: any) => {
+                a.push(cc.scaleTo(0, x.s[0] / 100, x.s[1] / 100))
+                a.push(cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100))
+              })
+
+              options.getNode(parentId).runAction(cc.sequence(a))
             }
           }
 
