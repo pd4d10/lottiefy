@@ -1,12 +1,13 @@
-import typescript from 'rollup-plugin-typescript2'
-
 export default [
   {
     input: './src/index.ts',
     plugins: [
-      typescript({
+      require('rollup-plugin-typescript2')({
         cacheRoot: '/tmp/rollup-ts-cache',
+        // typescript: require('typescript'),
       }),
+      // require('rollup-plugin-node-resolve')({}),
+      // require('rollup-plugin-commonjs')(),
     ],
     output: {
       file: 'dist/lottie-cocos.js',
