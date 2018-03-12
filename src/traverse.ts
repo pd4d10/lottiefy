@@ -176,19 +176,121 @@ export function traverse(data: any, containerId: string, options: Options) {
     }
   }
 
+  function _applyTransform(
+    layer: any,
+    id: string,
+    parentId: string,
+    width: number,
+    height: number,
+    options: Options
+  ) {
+    const parseK = (k: any[]) => {
+      // console.log(k)
+      return k.reduceRight(
+        (result, item, i) => {
+          const { s, e, to, ti, t } = item
+          if (s) {
+            result.arr.unshift({
+              s,
+              e,
+              to,
+              ti,
+              t: getTime(result.nextTime - t),
+              startTime: i === 0 ? getTime(t) : 0,
+            })
+          } else {
+            // result.allTime = t
+          }
+          result.nextTime = t
+          return result
+        },
+        {
+          nextTime: null,
+          // allTime: null,
+          arr: [],
+        }
+      )
+    }
+
+    // anchor
+    if (layer.ks.a && layer.ks.a.k) {
+      const [x, y] = layer.ks.a.k
+      if (typeof x === 'number' && typeof y === 'number') {
+        // let { w = 10000, h = 10000 } = layer // FIXME:
+        options.setAnchorPoint(id, x / width, 1 - y / height)
+      }
+    }
+
+    // position
+    if (layer.ks.p) {
+      if (typeof layer.ks.p.k[0] === 'number') {
+        var [x, y] = layer.ks.p.k
+        options.setPosition(id, parentId, x, y)
+      } else if (layer.ks.p.k.length) {
+        let a: any = []
+        const parentHeight = options.getNode(parentId).height
+        options.setPosition(id, parentId, layer.ks.p.k[0].s[0], layer.ks.p.k[0].s[1])
+        parseK(layer.ks.p.k).arr.forEach((x: any) => {
+          a.push(
+            cc.moveTo(x.startTime, cc.p(x.s[0], parentHeight - x.s[1])),
+            cc.bezierTo(x.t, [
+              // cc.p(x.s[0], parentHeight - x.s[1]),
+              cc.p(x.ti[0], parentHeight - x.ti[1]),
+              cc.p(x.to[0], parentHeight - x.to[1]),
+              cc.p(x.e[0], parentHeight - x.e[1]),
+            ])
+          )
+        })
+
+        options.getNode(id).runAction(cc.sequence(a))
+      }
+    }
+
+    // rotation
+    if (layer.ks.r && layer.ks.r.k) {
+      if (typeof layer.ks.r.k[0] === 'number') {
+        options.getNode(id).setRotation(layer.ks.r.k[0])
+      } else {
+        let a: any = []
+        options.getNode(id).setRotation(layer.ks.r.k[0].s[0])
+        parseK(layer.ks.r.k).arr.forEach((x: any) => {
+          a.push(cc.rotateTo(x.startTime, x.s[0]))
+          a.push(cc.rotateTo(x.t, x.e[0]))
+        })
+        options.getNode(id).runAction(cc.sequence(a))
+      }
+    }
+
+    // scale
+    if (layer.ks.s) {
+      if (typeof layer.ks.s.k[0] === 'number') {
+        options.getNode(id).setScale(layer.ks.s.k[0] / 100, layer.ks.s.k[1] / 100)
+      } else {
+        let a: any = []
+        options.getNode(id).setScale(layer.ks.s.k[0].s[0] / 100, layer.ks.s.k[0].s[1] / 100)
+        parseK(layer.ks.s.k).arr.forEach((x: any) => {
+          a.push(cc.scaleTo(x.startTime, x.s[0] / 100, x.s[1] / 100))
+          a.push(cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100))
+        })
+
+        options.getNode(id).runAction(cc.sequence(a))
+      }
+    }
+  }
+
   function _traverseLayer(layer: any, parentId: string, options: Options) {
-    // console.log(layer.nm)
+    console.log(layer.nm)
     // options.createLayer(id)
 
     switch (layer.ty) {
       case Layer.shape: {
-        const id = v4()
-        options.createLayer(id, 0, 0)
-        options.setPosition(id, parentId, layer.ks.p.k[0], layer.ks.p.k[1])
-        options.addChild(id, parentId)
-        for (let shape of layer.shapes) {
-          _traverseShape(shape, id)
-        }
+        // const id = v4()
+        // options.createLayer(id, 0, 0)
+        // options.setPosition(id, parentId, layer.ks.p.k[0], layer.ks.p.k[1])
+        // options.addChild(id, parentId)
+        // for (let shape of layer.shapes) {
+        //   _traverseShape(shape, id)
+        // }
         break
       }
       case Layer.solid: {
@@ -198,12 +300,14 @@ export function traverse(data: any, containerId: string, options: Options) {
         const id = layer.refId
         const asset = getAsset(id)
         if (!asset) break
-        options.createSprite(id, asset.p)
+        options.createSprite(id, asset.u + asset.p)
         options.setContentSize(id, asset.w, asset.h)
-        options.getNode(id).ignoreAnchorPointForPosition(false)
-        options.setAnchorPoint(id, layer.ks.a.k[0] / asset.w, layer.ks.a.k[1] / asset.h)
-        options.getNode(id).setPosition(layer.ks.p.k[0], layer.ks.p.k[1])
+        // options.getNode(id).ignoreAnchorPointForPosition(false)
+        // options.setAnchorPoint(id, layer.ks.a.k[0] / asset.w, layer.ks.a.k[1] / asset.h)
+        // options.getNode(id).setPosition(layer.ks.p.k[0], layer.ks.p.k[1])
         options.addChild(id, parentId)
+        _applyTransform(layer, id, parentId, asset.w, asset.h, options)
+
         break
       }
       case Layer.precomp: {
@@ -227,86 +331,7 @@ export function traverse(data: any, containerId: string, options: Options) {
         if (layer.ks.o) {
         }
 
-        const parseK = (k: any[]) => {
-          // console.log(k)
-          return k.reduceRight(
-            (result, item) => {
-              const { s, e, to, ti, t } = item
-              if (s) {
-                result.arr.unshift({ s, e, to, ti, t: getTime(result.nextTime - t) })
-              } else {
-                // result.allTime = t
-              }
-              result.nextTime = t
-              return result
-            },
-            {
-              nextTime: null,
-              // allTime: null,
-              arr: [],
-            }
-          )
-        }
-
-        // anchor
-        if (layer.ks.a && layer.ks.a.k) {
-          const [x, y] = layer.ks.a.k
-          if (typeof x === 'number' && typeof y === 'number') {
-            let { w = 10000, h = 10000 } = layer // FIXME:
-            options.setAnchorPoint(id, x / w, 1 - y / h)
-          }
-        }
-
-        // position
-        if (layer.ks.p) {
-          if (typeof layer.ks.p.k[0] === 'number') {
-            var [x, y] = layer.ks.p.k
-            options.setPosition(id, parentId, x, y)
-          } else if (layer.ks.p.k.length) {
-            let a: any = []
-            options.setPosition(id, parentId, layer.ks.p.k[0].s[0], layer.ks.p.k[0].s[1])
-            const parentHeight = options.getNode(parentId).height
-            parseK(layer.ks.p.k).arr.forEach((x: any) => {
-              a.push(
-                cc.bezierTo(x.t, [
-                  cc.p(x.s[0], parentHeight - x.s[1]),
-                  cc.p(x.ti[0], parentHeight - x.ti[1]),
-                  cc.p(x.to[0], parentHeight - x.to[1]),
-                  cc.p(x.e[0], parentHeight - x.e[1]),
-                ])
-              )
-            })
-
-            options.getNode(id).runAction(cc.sequence(a))
-          }
-        }
-
-        // rotation
-        if (layer.ks.r && layer.ks.r.k) {
-          if (typeof layer.ks.r.k[0] === 'number') {
-          } else {
-            let a: any = []
-            parseK(layer.ks.r.k).arr.forEach((x: any) => {
-              a.push(cc.rotateTo(0, x.s[0]))
-              a.push(cc.rotateTo(x.t, x.e[0]))
-            })
-            options.getNode(id).runAction(cc.sequence(a))
-          }
-        }
-
-        // scale
-        if (layer.ks.s) {
-          if (typeof layer.ks.s.k[0] === 'number') {
-          } else {
-            let a: any = []
-            parseK(layer.ks.s.k).arr.forEach((x: any) => {
-              a.push(cc.scaleTo(0, x.s[0] / 100, x.s[1] / 100))
-              a.push(cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100))
-            })
-
-            options.getNode(id).runAction(cc.sequence(a))
-          }
-        }
+        _applyTransform(layer, id, parentId, layer.w, layer.h, options)
 
         // effects
         if (layer.ef) {

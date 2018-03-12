@@ -61,12 +61,13 @@ export default function lottie(data: any, g: any) {
       // console.log(node)
     },
     createLayer(id, width, height) {
-      // console.log(id)
       layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
+      console.log(layers[id])
+      // layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
     },
     createSprite(id, name) {
       // layers[id] = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(name))
-      layers[id] = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(name))
+      layers[id] = new cc.Sprite(name)
     },
     setPosition(id, parentId, x, y) {
       // console.log(id, x, layers[parentId].height - y, layers[id])
