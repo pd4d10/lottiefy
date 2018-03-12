@@ -12,7 +12,7 @@ export default function lottie(data: any, g: any) {
 
   // container.setPosition(0, cc.winSize.height)
   // container.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
-  container.setScale(0.4)
+  // container.setScale(0.4)
   // container.setPosition(500, 500)
   // window.g = globalLayer
   // container.setScale(cc.winSize.height / 1920)
@@ -61,9 +61,9 @@ export default function lottie(data: any, g: any) {
       // console.log(node)
     },
     createLayer(id, width, height) {
-      layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
+      // layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
       console.log(layers[id])
-      // layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
+      layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
     },
     createSprite(id, name) {
       // layers[id] = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(name))

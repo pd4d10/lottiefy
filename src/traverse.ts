@@ -55,6 +55,7 @@ interface Options {
 
 export function traverse(data: any, containerId: string, options: Options) {
   const getTime = (time: number) => time / data.fr
+  // const getTime = (time: number) => time / 5
 
   let assets: {
     [id: string]: any
@@ -235,8 +236,8 @@ export function traverse(data: any, containerId: string, options: Options) {
             cc.moveTo(x.startTime, cc.p(x.s[0], parentHeight - x.s[1])),
             cc.bezierTo(x.t, [
               // cc.p(x.s[0], parentHeight - x.s[1]),
-              cc.p(x.ti[0], parentHeight - x.ti[1]),
-              cc.p(x.to[0], parentHeight - x.to[1]),
+              cc.p(x.s[0] + x.to[0], parentHeight - (x.s[1] + x.to[1])),
+              cc.p(x.ti[0] + x.e[0], parentHeight - (x.ti[1] + x.e[1])),
               cc.p(x.e[0], parentHeight - x.e[1]),
             ])
           )
