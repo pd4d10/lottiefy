@@ -121,7 +121,6 @@ export function traverse(data: any, containerId: string, options: Options) {
           // )
         }
         if (shape.ks) {
-          // console.log(shape.ks.k)
           if (Array.isArray(shape.ks.k)) {
             c(shape.ks.k[0].s[0])
           } else {
@@ -189,7 +188,6 @@ export function traverse(data: any, containerId: string, options: Options) {
     const delay = cc.delayTime(getTime(st))
 
     const parseK = (k: any[]) => {
-      // console.log(k)
       return k.reduceRight(
         (result, item, i) => {
           const { s, e, to, ti, t } = item
@@ -235,7 +233,6 @@ export function traverse(data: any, containerId: string, options: Options) {
         const parentHeight = options.getNode(parentId).height
         options.setPosition(id, parentId, layer.ks.p.k[0].s[0], layer.ks.p.k[0].s[1])
         parseK(layer.ks.p.k).arr.forEach((x: any) => {
-          // console.log(x.startTime)
           a.push(
             cc.moveTo(x.startTime, cc.p(x.s[0], parentHeight - x.s[1])),
             cc.bezierTo(x.t, [
@@ -245,7 +242,6 @@ export function traverse(data: any, containerId: string, options: Options) {
             ])
           )
         })
-        console.log(layer.refId, st)
         a.unshift(delay)
         options.getNode(id).runAction(cc.sequence(a))
       }
@@ -291,8 +287,6 @@ export function traverse(data: any, containerId: string, options: Options) {
   function _traverseLayer(layer: any, parentId: string, options: Options, st: number) {
     // console.log(layer.nm)
     // options.createLayer(id)
-    // console.log(st)
-    st = st + (layer.st || 0)
 
     switch (layer.ty) {
       case Layer.shape: {
@@ -353,8 +347,8 @@ export function traverse(data: any, containerId: string, options: Options) {
         }
 
         if (asset.layers) {
-          for (let layer of asset.layers) {
-            _traverseLayer(layer, id, options, st)
+          for (let l of asset.layers) {
+            _traverseLayer(l, id, options, st + (layer.st || 0))
           }
         }
 
@@ -366,7 +360,7 @@ export function traverse(data: any, containerId: string, options: Options) {
 
   function _traverse(item: any, parentId: string, options: Options) {
     for (let layer of item.layers) {
-      _traverseLayer(layer, parentId, options, item.st || 0)
+      _traverseLayer(layer, parentId, options, 0)
     }
   }
 
