@@ -5,7 +5,8 @@ import { traverse } from './traverse'
 export default function lottie(data: any, g: any) {
   const layers: { [id: string]: cc.Layer | cc.Sprite | cc.DrawNode } = {}
 
-  const container = new cc.LayerColor(cc.color(0, 0, 255, 100), 1080, 1920)
+  // const container = new cc.LayerColor(cc.color(0, 0, 255, 100), 1080, 1920)
+  const container = new cc.LayerColor(cc.color(0, 0, 0, 0), 1080, 1920)
   // container.setContentSize(100, 100)
   // container.ignoreAnchorPointForPosition(false)
   // container.setAnchorPoint(0.5, 0.5)
@@ -62,7 +63,7 @@ export default function lottie(data: any, g: any) {
     },
     createLayer(id, width, height) {
       // layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
-      console.log(layers[id])
+      // console.log(layers[id])
       layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
     },
     createSprite(id, name) {

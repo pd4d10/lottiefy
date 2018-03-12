@@ -55,7 +55,7 @@ interface Options {
 
 export function traverse(data: any, containerId: string, options: Options) {
   const getTime = (time: number) => time / data.fr
-  // const getTime = (time: number) => time / 5
+  // const getTime = (time: number) => time
 
   let assets: {
     [id: string]: any
@@ -183,8 +183,11 @@ export function traverse(data: any, containerId: string, options: Options) {
     parentId: string,
     width: number,
     height: number,
+    st: number,
     options: Options
   ) {
+    const delay = cc.delayTime(getTime(st))
+
     const parseK = (k: any[]) => {
       // console.log(k)
       return k.reduceRight(
@@ -232,32 +235,36 @@ export function traverse(data: any, containerId: string, options: Options) {
         const parentHeight = options.getNode(parentId).height
         options.setPosition(id, parentId, layer.ks.p.k[0].s[0], layer.ks.p.k[0].s[1])
         parseK(layer.ks.p.k).arr.forEach((x: any) => {
+          // console.log(x.startTime)
           a.push(
             cc.moveTo(x.startTime, cc.p(x.s[0], parentHeight - x.s[1])),
             cc.bezierTo(x.t, [
-              // cc.p(x.s[0], parentHeight - x.s[1]),
               cc.p(x.s[0] + x.to[0], parentHeight - (x.s[1] + x.to[1])),
               cc.p(x.ti[0] + x.e[0], parentHeight - (x.ti[1] + x.e[1])),
               cc.p(x.e[0], parentHeight - x.e[1]),
             ])
           )
         })
-
+        console.log(layer.refId, st)
+        a.unshift(delay)
         options.getNode(id).runAction(cc.sequence(a))
       }
     }
 
     // rotation
     if (layer.ks.r && layer.ks.r.k) {
-      if (typeof layer.ks.r.k[0] === 'number') {
+      if (typeof layer.ks.r.k === 'number') {
+        options.getNode(id).setRotation(layer.ks.r.k)
+      } else if (typeof layer.ks.r.k[0] === 'number') {
         options.getNode(id).setRotation(layer.ks.r.k[0])
       } else {
+        // console.log(layer.ks.r.k)
         let a: any = []
         options.getNode(id).setRotation(layer.ks.r.k[0].s[0])
         parseK(layer.ks.r.k).arr.forEach((x: any) => {
-          a.push(cc.rotateTo(x.startTime, x.s[0]))
-          a.push(cc.rotateTo(x.t, x.e[0]))
+          a.push(cc.rotateTo(x.startTime, x.s[0]), cc.rotateTo(x.t, x.e[0]))
         })
+        a.unshift(delay)
         options.getNode(id).runAction(cc.sequence(a))
       }
     }
@@ -270,18 +277,22 @@ export function traverse(data: any, containerId: string, options: Options) {
         let a: any = []
         options.getNode(id).setScale(layer.ks.s.k[0].s[0] / 100, layer.ks.s.k[0].s[1] / 100)
         parseK(layer.ks.s.k).arr.forEach((x: any) => {
-          a.push(cc.scaleTo(x.startTime, x.s[0] / 100, x.s[1] / 100))
-          a.push(cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100))
+          a.push(
+            cc.scaleTo(x.startTime, x.s[0] / 100, x.s[1] / 100),
+            cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100)
+          )
         })
-
+        a.unshift(delay)
         options.getNode(id).runAction(cc.sequence(a))
       }
     }
   }
 
-  function _traverseLayer(layer: any, parentId: string, options: Options) {
-    console.log(layer.nm)
+  function _traverseLayer(layer: any, parentId: string, options: Options, st: number) {
+    // console.log(layer.nm)
     // options.createLayer(id)
+    // console.log(st)
+    st = st + (layer.st || 0)
 
     switch (layer.ty) {
       case Layer.shape: {
@@ -307,7 +318,7 @@ export function traverse(data: any, containerId: string, options: Options) {
         // options.setAnchorPoint(id, layer.ks.a.k[0] / asset.w, layer.ks.a.k[1] / asset.h)
         // options.getNode(id).setPosition(layer.ks.p.k[0], layer.ks.p.k[1])
         options.addChild(id, parentId)
-        _applyTransform(layer, id, parentId, asset.w, asset.h, options)
+        _applyTransform(layer, id, parentId, asset.w, asset.h, st, options)
 
         break
       }
@@ -332,7 +343,7 @@ export function traverse(data: any, containerId: string, options: Options) {
         if (layer.ks.o) {
         }
 
-        _applyTransform(layer, id, parentId, layer.w, layer.h, options)
+        _applyTransform(layer, id, parentId, layer.w, layer.h, st, options)
 
         // effects
         if (layer.ef) {
@@ -343,7 +354,7 @@ export function traverse(data: any, containerId: string, options: Options) {
 
         if (asset.layers) {
           for (let layer of asset.layers) {
-            _traverseLayer(layer, id, options)
+            _traverseLayer(layer, id, options, st)
           }
         }
 
@@ -355,7 +366,7 @@ export function traverse(data: any, containerId: string, options: Options) {
 
   function _traverse(item: any, parentId: string, options: Options) {
     for (let layer of item.layers) {
-      _traverseLayer(layer, parentId, options)
+      _traverseLayer(layer, parentId, options, item.st || 0)
     }
   }
 
