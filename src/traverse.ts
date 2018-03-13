@@ -80,12 +80,13 @@ export function traverse(data: any, containerId: string, options: Options) {
         const d = {
           width: 0,
           color: cc.color('#fff'),
-          data: [[]],
+          data: [],
         }
         for (let item of data.it) {
           _traverseShape(item, parentId, node, d)
         }
-        d.data.forEach(item => {
+        d.data.forEach((item: any[]) => {
+          // console.log(item)
           node.drawCubicBezier(item[0], item[1], item[2], item[3], 100, d.width, d.color)
         })
         options.getNode(parentId).addChild(node)
