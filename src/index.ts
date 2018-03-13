@@ -47,24 +47,24 @@ export default function lottie(data: any, g: any) {
       //   )
       // }, ii * 1000)
       // ii++
-      // node.drawCubicBezier(
-      //   cc.p(x0, y0),
-      //   cc.p(x1, y1),
-      //   cc.p(x2, y2),
-      //   cc.p(x3, y3),
-      //   100,
-      //   10,
-      //   cc.color('#ff0')
-      // )
-      node.drawSegment(cc.p(x0, parentNode.height - y0), cc.p(x3, parentNode.height - y3), 10)
+      node.drawCubicBezier(
+        cc.p(x0, y0),
+        cc.p(x1, y1),
+        cc.p(x2, y2),
+        cc.p(x3, y3),
+        100,
+        20,
+        cc.color(255, 255, 255, 255)
+      )
+      // node.drawSegment(cc.p(x0, parentNode.height - y0), cc.p(x3, parentNode.height - y3), 10)
       layers[id] = node
       this.addChild(id, parentId)
       // console.log(node)
     },
     createLayer(id, width, height) {
-      // layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
+      layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
       // console.log(layers[id])
-      layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
+      // layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
     },
     createSprite(id, name) {
       // layers[id] = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(name))

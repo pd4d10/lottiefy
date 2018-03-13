@@ -73,59 +73,57 @@ export function traverse(data: any, containerId: string, options: Options) {
     return assets[id]
   }
 
-  function _traverseShape(shape: any, parentId: string, node?: cc.DrawNode) {
-    switch (shape.ty) {
+  function _traverseShape(data: any, parentId: string, node?: cc.DrawNode, d?: any) {
+    switch (data.ty) {
       case Shape.group: {
         const node = new cc.DrawNode()
-        options.getNode(parentId).addChild(node)
-        for (let item of shape.it) {
-          _traverseShape(item, parentId, node)
+        const d = {
+          width: 0,
+          color: cc.color('#fff'),
+          data: [[]],
         }
+        for (let item of data.it) {
+          _traverseShape(item, parentId, node, d)
+        }
+        d.data.forEach(item => {
+          node.drawCubicBezier(item[0], item[1], item[2], item[3], 100, d.width, d.color)
+        })
+        options.getNode(parentId).addChild(node)
       }
       case Shape.stroke: {
         if (node) {
-          node.setColor(cc.color(shape.c.k.map((x: number) => x * 255)))
-          node.width = shape.w.k
+          const [r, g, b, a] = (data.c.k as any[]).map(x => x * 255)
+          d.color = cc.color(r, g, b, a)
+          d.width = data.w.k
         }
       }
       case Shape.shape: {
-        // const id = cid || v4()
-        const id = v4()
-        const c = (x: any) => {
-          const { i, o, v } = x
-          for (let j = 0; j < i.length - 1; j++) {
-            options.createShape(
-              id,
-              parentId,
-              v[j + 1][0],
-              v[j + 1][1],
-              i[j][0],
-              i[j][1],
-              o[j][0],
-              o[j][1],
-              v[j][0],
-              v[j][1]
-            )
+        if (node && d) {
+          const c = (x: any) => {
+            const { i, o, v } = x
+            const parentNode = options.getNode(parentId)
+            // node.drawDots(v.map((x: any) => cc.p(x[0], x[1])), 10, cc.color('#ff0'))
+
+            d.data = []
+            for (let j = 0; j < v.length - 1; j++) {
+              d.data.push([
+                cc.p(v[j][0], parentNode.height - v[j][1]),
+                cc.p(v[j][0] + o[j][0], parentNode.height - v[j][1] - o[j][1]),
+                cc.p(v[j + 1][0] + i[j + 1][0], parentNode.height - v[j + 1][1] - i[j + 1][1]),
+                cc.p(v[j + 1][0], parentNode.height - v[j + 1][1]),
+              ])
+            }
+            // parentNode.addChild(node)
           }
-          // options.createShape(
-          //   id,
-          //   parentId,
-          //   v[i.length - 1][0],
-          //   v[i.length - 1][1],
-          //   o[0][0],
-          //   o[0][1],
-          //   i[0][0],
-          //   i[0][1],
-          //   v[0][0],
-          //   v[0][1]
-          // )
-        }
-        if (shape.ks) {
-          if (Array.isArray(shape.ks.k)) {
-            c(shape.ks.k[0].s[0])
-          } else {
-            c(shape.ks.k)
-            // const { v: [[x0, y0], [x1, y1]] } = shape.ks.k
+          if (data.ks) {
+            if (data.ks.a) {
+              c(data.ks.k[0].s[0])
+
+              // animation
+              // FIXME: shape animation
+            } else {
+              c(data.ks.k)
+            }
           }
         }
       }
@@ -164,17 +162,21 @@ export function traverse(data: any, containerId: string, options: Options) {
     dropDown = 7,
   }
 
-  function _traverseEffect(effect: any, parentId: string) {
-    switch (effect.ty) {
+  function _traverseEffect(data: any, parentId: string, node: cc.DrawNode) {
+    switch (data.ty) {
       case Effect.group: {
-        for (let item of effect.ef) {
-          _traverseEffect(item, parentId)
+        if (data.mn === 'ADBE Gaussian Blur 2') {
+        }
+        for (let item of data.ef) {
+          _traverseEffect(item, parentId, node)
         }
       }
       case Effect.dropDown: {
       }
     }
   }
+
+  function _applyAnchor(layer: any, id: string, width: number, height: number) {}
 
   function _applyTransform(
     layer: any,
@@ -220,7 +222,13 @@ export function traverse(data: any, containerId: string, options: Options) {
       if (typeof x === 'number' && typeof y === 'number') {
         // let { w = 10000, h = 10000 } = layer // FIXME:
         options.setAnchorPoint(id, x / width, 1 - y / height)
+        // console.log(id, x, y, height)
       }
+      // if (parentId === 'comp_2') {
+      //   const node = new cc.DrawNode()
+      //   node.drawDot(cc.p(x, height - y), 10, cc.color(255, 0, 0, 255))
+      //   options.getNode(parentId).addChild(node)
+      // }
     }
 
     // position
@@ -288,15 +296,20 @@ export function traverse(data: any, containerId: string, options: Options) {
     // console.log(layer.nm)
     // options.createLayer(id)
 
+    const { width, height } = options.getNode(parentId)
+    console.log(parentId, width, height)
+
     switch (layer.ty) {
       case Layer.shape: {
-        // const id = v4()
-        // options.createLayer(id, 0, 0)
+        const id = v4()
+        options.createLayer(id, 0, 0)
+        _applyTransform(layer, id, parentId, width, height, st, options)
+
         // options.setPosition(id, parentId, layer.ks.p.k[0], layer.ks.p.k[1])
-        // options.addChild(id, parentId)
-        // for (let shape of layer.shapes) {
-        //   _traverseShape(shape, id)
-        // }
+        options.addChild(id, parentId)
+        for (let shape of layer.shapes) {
+          _traverseShape(shape, id)
+        }
         break
       }
       case Layer.solid: {
@@ -342,13 +355,28 @@ export function traverse(data: any, containerId: string, options: Options) {
         // effects
         if (layer.ef) {
           for (let item of layer.ef) {
-            _traverseEffect(item, parentId)
+            // _traverseEffect(item, parentId)
           }
         }
 
         if (asset.layers) {
+          // FIXME: parent before child
+          const sortedLayers = []
+          const indexIdMapping: any = {}
           for (let l of asset.layers) {
-            _traverseLayer(l, id, options, st + (layer.st || 0))
+            if (l.parent) {
+              sortedLayers.push(l)
+            } else {
+              sortedLayers.unshift(l)
+            }
+            if (l.refId && l.ind) {
+              indexIdMapping[l.ind] = l.refId
+            }
+          }
+
+          for (let l of sortedLayers) {
+            const correctId = l.parent ? indexIdMapping[l.parent] : id
+            _traverseLayer(l, correctId, options, st + (layer.st || 0))
           }
         }
 
