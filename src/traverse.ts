@@ -222,13 +222,8 @@ export function traverse(data: any, containerId: string, options: Options) {
       if (typeof x === 'number' && typeof y === 'number') {
         // let { w = 10000, h = 10000 } = layer // FIXME:
         options.setAnchorPoint(id, x / width, 1 - y / height)
-        // console.log(id, x, y, height)
+        console.log(id, x, y, height)
       }
-      // if (parentId === 'comp_2') {
-      //   const node = new cc.DrawNode()
-      //   node.drawDot(cc.p(x, height - y), 10, cc.color(255, 0, 0, 255))
-      //   options.getNode(parentId).addChild(node)
-      // }
     }
 
     // position
@@ -294,18 +289,14 @@ export function traverse(data: any, containerId: string, options: Options) {
 
   function _traverseLayer(layer: any, parentId: string, options: Options, st: number) {
     // console.log(layer.nm)
-    // options.createLayer(id)
-
     const { width, height } = options.getNode(parentId)
-    console.log(parentId, width, height)
+    // console.log(parentId, width, height)
 
     switch (layer.ty) {
       case Layer.shape: {
         const id = v4()
-        options.createLayer(id, 0, 0)
+        options.createLayer(id, width, height)
         _applyTransform(layer, id, parentId, width, height, st, options)
-
-        // options.setPosition(id, parentId, layer.ks.p.k[0], layer.ks.p.k[1])
         options.addChild(id, parentId)
         for (let shape of layer.shapes) {
           _traverseShape(shape, id)
