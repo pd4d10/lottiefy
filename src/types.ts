@@ -11,7 +11,7 @@ export interface Options {
   moveTo(id: string, parentId: string, time: number, x: number, y: number): any
   setContentSize(id: string, width: number, height: number): any
   addChild(id: string, parentId: string, localZOrder?: number): any
-  getNode(id: string): cc.Node
+  getNode(id: string): any
 
   createDrawNode(id: string, parentId: string): any
   drawCubicBezier(
