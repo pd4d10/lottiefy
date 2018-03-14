@@ -1,36 +1,9 @@
 // import { v4 } from 'uuid'
-import { Options } from './types'
+import { Options, Layer, Shape, Effect } from './types'
 /// <reference path="../typings/cocos2d/cocos2d-lib.d.ts" />
 
 declare var uuid: any
 const { v4 } = uuid
-// import {
-//   Animation,
-//   Assets,
-//   Height1,
-//   Width2,
-//   Id,
-//   ImageName,
-//   ImagePath,
-//   Id1,
-//   Layers1,
-//   Items,
-// } from '../typings/animation'
-
-// type Asset =
-//   | {
-//       h?: Height1
-//       w?: Width2
-//       id?: Id
-//       p?: ImageName
-//       u?: ImagePath
-//       [k: string]: any
-//     }
-//   | {
-//       id?: Id1
-//       layers?: Layers1
-//       [k: string]: any
-//     }
 
 export function traverse(data: any, containerId: string, options: Options) {
   const getTime = (time: number) => time / data.fr
@@ -91,7 +64,6 @@ export function traverse(data: any, containerId: string, options: Options) {
                 cc.p(v[j + 1][0], parentNode.height - v[j + 1][1]),
               ])
             }
-            // parentNode.addChild(node)
           }
           if (data.ks) {
             if (data.ks.a) {
@@ -106,38 +78,6 @@ export function traverse(data: any, containerId: string, options: Options) {
         }
       }
     }
-  }
-
-  // const converters = {
-  //   shape(data) {
-
-  //   }
-  // }
-  enum Layer {
-    precomp = 0,
-    solid = 1,
-    image = 2,
-    null = 3,
-    shape = 4,
-    text = 5,
-  }
-
-  enum Shape {
-    ellipse = 'el',
-    group = 'gr',
-    shape = 'sh',
-    transform = 'tr',
-    stroke = 'st',
-  }
-
-  enum Effect {
-    slider = 0,
-    angle = 1,
-    color = 2,
-    point = 3,
-    checkbox = 4,
-    group = 5,
-    dropDown = 7,
   }
 
   // function _traverseEffect(data: any, parentId: string, node: cc.DrawNode) {
@@ -178,15 +118,12 @@ export function traverse(data: any, containerId: string, options: Options) {
               t: getTime(result.nextTime - t),
               startTime: i === 0 ? getTime(t) : 0,
             })
-          } else {
-            // result.allTime = t
           }
           result.nextTime = t
           return result
         },
         {
           nextTime: null,
-          // allTime: null,
           arr: [],
         }
       )
@@ -241,7 +178,6 @@ export function traverse(data: any, containerId: string, options: Options) {
   function _traverseLayer(layer: any, parentId: string, options: Options, st: number) {
     // console.log(layer.nm)
     const { width, height } = options.getNode(parentId)
-    // console.log(parentId, width, height)
 
     switch (layer.ty) {
       case Layer.shape: {

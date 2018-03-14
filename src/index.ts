@@ -24,32 +24,6 @@ export default function lottie(data: any, g: any) {
   let ii = 0
 
   traverse(data, containerId, {
-    createShape(
-      id: string,
-      parentId: string,
-      x0: number,
-      y0: number,
-      x1: number,
-      y1: number,
-      x2: number,
-      y2: number,
-      x3: number,
-      y3: number
-    ) {
-      // const parentNode = this.getNode(parentId)
-      // const node = new cc.DrawNode()
-      // node.drawCubicBezier(
-      //   cc.p(x0, y0),
-      //   cc.p(x1, y1),
-      //   cc.p(x2, y2),
-      //   cc.p(x3, y3),
-      //   100,
-      //   20,
-      //   cc.color(255, 255, 255, 255)
-      // )
-      // layers[id] = node
-      // this.addChild(id, parentId)
-    },
     createLayer(id, width, height) {
       // layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
       layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)

@@ -1,16 +1,4 @@
 export interface Options {
-  createShape(
-    id: string,
-    parentId: string,
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    x3: number,
-    y3: number
-  ): any
   createLayer(id: string, width?: number, height?: number): any
   createSprite(id: string, name: string): any
   setPosition(id: string, x: number, y: number): any
@@ -42,4 +30,31 @@ export type Color = {
   g: number
   b: number
   a: number
+}
+
+export enum Layer {
+  precomp = 0,
+  solid = 1,
+  image = 2,
+  null = 3,
+  shape = 4,
+  text = 5,
+}
+
+export enum Shape {
+  ellipse = 'el',
+  group = 'gr',
+  shape = 'sh',
+  transform = 'tr',
+  stroke = 'st',
+}
+
+export enum Effect {
+  slider = 0,
+  angle = 1,
+  color = 2,
+  point = 3,
+  checkbox = 4,
+  group = 5,
+  dropDown = 7,
 }
