@@ -6,7 +6,12 @@ import { Options, Layer, Shape, Effect } from './types'
 // const { v4 } = uuid
 const genId = () => 'v' + v4().replace(/-/g, '_F') // for lua variables
 
-export function traverse(data: any, containerId: string, options: Options) {
+export function traverse(
+  data: any,
+  containerId: string,
+  useSpriteFrame: boolean,
+  options: Options,
+) {
   const getTime = (time: number) => time / data.fr
   // const getTime = (time: number) => time
 
@@ -251,8 +256,7 @@ export function traverse(data: any, containerId: string, options: Options) {
         const asset = getAsset(id)
         if (!asset) break
         // TODO: sprite frame
-        options.createSprite(id, asset.u + asset.p)
-        // options.createSprite(id, asset.p)
+        options.createSprite(id, (useSpriteFrame ? '' : asset.u) + asset.p)
         options.setContentSize(id, asset.w, asset.h)
         options.addChild(id, parentId)
         _applyTransform(

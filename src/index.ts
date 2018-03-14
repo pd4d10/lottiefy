@@ -23,7 +23,7 @@ export default function lottie(data: any, g: any) {
   ;(window as any).c = container
   let ii = 0
 
-  traverse(data, containerId, {
+  traverse(data, containerId, false, {
     createLayer(id, width, height) {
       // layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
       layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
@@ -44,7 +44,7 @@ export default function lottie(data: any, g: any) {
             cc.p(x.s[0] + x.to[0], parentHeight - (x.s[1] + x.to[1])),
             cc.p(x.ti[0] + x.e[0], parentHeight - (x.ti[1] + x.e[1])),
             cc.p(x.e[0], parentHeight - x.e[1]),
-          ])
+          ]),
         )
       })
       a.unshift(cc.delayTime(delay))
@@ -69,7 +69,7 @@ export default function lottie(data: any, g: any) {
       data.forEach((x: any) => {
         a.push(
           cc.scaleTo(x.startTime, x.s[0] / 100, x.s[1] / 100),
-          cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100)
+          cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100),
         )
       })
       a.unshift(cc.delayTime(delay))
@@ -101,7 +101,15 @@ export default function lottie(data: any, g: any) {
     },
     drawCubicBezier(id, origin, c1, c2, dest, width, { r, g, b, a }) {
       let node = layers[id] as cc.DrawNode
-      node.drawCubicBezier(origin, c1, c2, dest, 100, width, cc.color(r, g, b, a))
+      node.drawCubicBezier(
+        origin,
+        c1,
+        c2,
+        dest,
+        100,
+        width,
+        cc.color(r, g, b, a),
+      )
     },
   })
 }

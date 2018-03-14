@@ -1,4 +1,5 @@
 // lua code generator
+// TODO: use ast
 
 import { traverse } from './traverse'
 import { Color } from './types'
@@ -30,7 +31,7 @@ export function lua(data: any) {
     g:setPosition(cc.p(0, ${data.h} * ratio))
   `)
 
-  traverse(data, 'g', {
+  traverse(data, 'g', true, {
     createLayer(id, width, height) {
       append(`local ${id} = cc.Layer:create()`)
       append(`${id}:setContentSize(${width}, ${height})`)
