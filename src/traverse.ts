@@ -1,9 +1,9 @@
-// import { v4 } from 'uuid'
+import { v4 } from 'uuid'
 import { Options, Layer, Shape, Effect } from './types'
 /// <reference path="../typings/cocos2d/cocos2d-lib.d.ts" />
 
-declare var uuid: any
-const { v4 } = uuid
+// declare var uuid: any
+// const { v4 } = uuid
 
 export function traverse(data: any, containerId: string, options: Options) {
   const getTime = (time: number) => time / data.fr
@@ -71,13 +71,13 @@ export function traverse(data: any, containerId: string, options: Options) {
             d.data = []
             for (let j = 0; j < v.length - 1; j++) {
               d.data.push([
-                cc.p(v[j][0], parentHeight - v[j][1]),
-                cc.p(v[j][0] + o[j][0], parentHeight - v[j][1] - o[j][1]),
-                cc.p(
-                  v[j + 1][0] + i[j + 1][0],
-                  parentHeight - v[j + 1][1] - i[j + 1][1],
-                ),
-                cc.p(v[j + 1][0], parentHeight - v[j + 1][1]),
+                { x: v[j][0], y: parentHeight - v[j][1] },
+                { x: v[j][0] + o[j][0], y: parentHeight - v[j][1] - o[j][1] },
+                {
+                  x: v[j + 1][0] + i[j + 1][0],
+                  y: parentHeight - v[j + 1][1] - i[j + 1][1],
+                },
+                { x: v[j + 1][0], y: parentHeight - v[j + 1][1] },
               ])
             }
           }
