@@ -4,6 +4,7 @@ import { Options, Layer, Shape, Effect } from './types'
 
 // declare var uuid: any
 // const { v4 } = uuid
+const genId = () => 'v' + v4().replace(/-/g, '_F') // for lua variables
 
 export function traverse(data: any, containerId: string, options: Options) {
   const getTime = (time: number) => time / data.fr
@@ -35,9 +36,9 @@ export function traverse(data: any, containerId: string, options: Options) {
   ) {
     switch (data.ty) {
       case Shape.group: {
-        const id = v4()
-        options.createDrawNode(id, parentId)
+        const id = genId()
         const d = {
+          id,
           width: 0,
           color: { r: 0, g: 0, b: 0, a: 0 },
           data: [],
@@ -45,6 +46,7 @@ export function traverse(data: any, containerId: string, options: Options) {
         for (let item of data.it) {
           _traverseShape(item, parentId, parentWidth, parentHeight, id, d)
         }
+        options.createDrawNode(id, parentId, d.width)
         d.data.forEach((item: any[]) => {
           options.drawCubicBezier(
             id,
@@ -221,7 +223,7 @@ export function traverse(data: any, containerId: string, options: Options) {
 
     switch (layer.ty) {
       case Layer.shape: {
-        const id = v4()
+        const id = genId()
         // same width and height as parent
         options.createLayer(id, parentWidth, parentHeight)
         _applyTransform(
@@ -248,7 +250,9 @@ export function traverse(data: any, containerId: string, options: Options) {
         const id = layer.refId
         const asset = getAsset(id)
         if (!asset) break
+        // TODO: sprite frame
         options.createSprite(id, asset.u + asset.p)
+        // options.createSprite(id, asset.p)
         options.setContentSize(id, asset.w, asset.h)
         options.addChild(id, parentId)
         _applyTransform(

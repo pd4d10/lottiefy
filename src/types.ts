@@ -2,7 +2,12 @@ export interface Options {
   createLayer(id: string, width?: number, height?: number): any
   createSprite(id: string, name: string): any
   setPosition(id: string, x: number, y: number): any
-  positionAnimate(id: string, data: any[], delay: number, parentHeight: number): any
+  positionAnimate(
+    id: string,
+    data: any[],
+    delay: number,
+    parentHeight: number,
+  ): any
   setAnchorPoint(id: string, x: number, y: number): any
   setRotation(id: string, rotation: number): any
   rotationAnimate(id: string, data: any[], delay: number): any
@@ -13,7 +18,7 @@ export interface Options {
   addChild(id: string, parentId: string, localZOrder?: number): any
   getNode(id: string): any
 
-  createDrawNode(id: string, parentId: string): any
+  createDrawNode(id: string, parentId: string, width: number): any
   drawCubicBezier(
     id: string,
     origin: cc.Point,
@@ -21,7 +26,7 @@ export interface Options {
     c2: cc.Point,
     dest: cc.Point,
     width: number,
-    color: Color
+    color: Color,
   ): any
 }
 
