@@ -36,49 +36,75 @@ export default function lottie(data: any, g: any) {
       x3: number,
       y3: number
     ) {
-      // console.log(arguments)
-      const parentNode = this.getNode(parentId)
-      const node = new cc.DrawNode()
-      // setTimeout(() => {
-      //   node.drawDots(
-      //     [cc.p(x0, y0), cc.p(x1, y1), cc.p(x2, y2), cc.p(x3, y3)],
-      //     10,
-      //     cc.color(255, 0, 0, 255)
-      //   )
-      // }, ii * 1000)
-      // ii++
-      node.drawCubicBezier(
-        cc.p(x0, y0),
-        cc.p(x1, y1),
-        cc.p(x2, y2),
-        cc.p(x3, y3),
-        100,
-        20,
-        cc.color(255, 255, 255, 255)
-      )
-      // node.drawSegment(cc.p(x0, parentNode.height - y0), cc.p(x3, parentNode.height - y3), 10)
-      layers[id] = node
-      this.addChild(id, parentId)
-      // console.log(node)
+      // const parentNode = this.getNode(parentId)
+      // const node = new cc.DrawNode()
+      // node.drawCubicBezier(
+      //   cc.p(x0, y0),
+      //   cc.p(x1, y1),
+      //   cc.p(x2, y2),
+      //   cc.p(x3, y3),
+      //   100,
+      //   20,
+      //   cc.color(255, 255, 255, 255)
+      // )
+      // layers[id] = node
+      // this.addChild(id, parentId)
     },
     createLayer(id, width, height) {
       // layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
-      // console.log(layers[id])
       layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
     },
     createSprite(id, name) {
       // layers[id] = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(name))
       layers[id] = new cc.Sprite(name)
     },
-    setPosition(id, parentId, x, y) {
-      // console.log(id, x, layers[parentId].height - y, layers[id])
-      layers[id].setPosition(x, layers[parentId].height - y)
+    setPosition(id, x, y) {
+      layers[id].setPosition(x, y)
+    },
+    positionAnimate(id, data, delay, parentHeight) {
+      const a: any[] = []
+      data.forEach((x: any) => {
+        a.push(
+          cc.moveTo(x.startTime, cc.p(x.s[0], parentHeight - x.s[1])),
+          cc.bezierTo(x.t, [
+            cc.p(x.s[0] + x.to[0], parentHeight - (x.s[1] + x.to[1])),
+            cc.p(x.ti[0] + x.e[0], parentHeight - (x.ti[1] + x.e[1])),
+            cc.p(x.e[0], parentHeight - x.e[1]),
+          ])
+        )
+      })
+      a.unshift(cc.delayTime(delay))
+      layers[id].runAction(cc.sequence(a))
+    },
+    setRotation(id, rotation) {
+      layers[id].setRotation(rotation)
+    },
+    rotationAnimate(id, data, delay) {
+      let a: any = []
+      data.forEach((x: any) => {
+        a.push(cc.rotateTo(x.startTime, x.s[0]), cc.rotateTo(x.t, x.e[0]))
+      })
+      a.unshift(cc.delayTime(delay))
+      layers[id].runAction(cc.sequence(a))
+    },
+    setScale(id, x, y) {
+      layers[id].setScale(x, y)
+    },
+    scaleAnimate(id, data, delay) {
+      let a: any = []
+      data.forEach((x: any) => {
+        a.push(
+          cc.scaleTo(x.startTime, x.s[0] / 100, x.s[1] / 100),
+          cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100)
+        )
+      })
+      a.unshift(cc.delayTime(delay))
+      layers[id].runAction(cc.sequence(a))
     },
     setContentSize(id, width, height) {
       layers[id].setContentSize(width, height)
     },
     setAnchorPoint(id, x, y) {
-      // console.log(arguments)
       layers[id].ignoreAnchorPointForPosition(false)
       layers[id].setAnchorPoint(x, y)
     },
@@ -93,6 +119,15 @@ export default function lottie(data: any, g: any) {
     },
     getNode(id) {
       return layers[id]
+    },
+
+    createDrawNode(id, parentId) {
+      layers[id] = new cc.DrawNode()
+      this.addChild(id, parentId)
+    },
+    drawCubicBezier(id, origin, c1, c2, dest, width, { r, g, b, a }) {
+      let node = layers[id] as cc.DrawNode
+      node.drawCubicBezier(origin, c1, c2, dest, 100, width, cc.color(r, g, b, a))
     },
   })
 }

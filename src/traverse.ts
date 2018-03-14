@@ -1,4 +1,5 @@
 // import { v4 } from 'uuid'
+import { Options } from './types'
 /// <reference path="../typings/cocos2d/cocos2d-lib.d.ts" />
 
 declare var uuid: any
@@ -16,28 +17,6 @@ const { v4 } = uuid
 //   Items,
 // } from '../typings/animation'
 
-interface Options {
-  createShape(
-    id: string,
-    parentId: string,
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    x3: number,
-    y3: number
-  ): any
-  createLayer(id: string, width?: number, height?: number): any
-  createSprite(id: string, name: string): any
-  setPosition(id: string, parentId: string, x: number, y: number): any
-  setAnchorPoint(id: string, x: number, y: number): any
-  moveTo(id: string, parentId: string, time: number, x: number, y: number): any
-  setContentSize(id: string, width: number, height: number): any
-  addChild(id: string, parentId: string, localZOrder?: number): any
-  getNode(id: string): cc.Node
-}
 // type Asset =
 //   | {
 //       h?: Height1
@@ -73,37 +52,35 @@ export function traverse(data: any, containerId: string, options: Options) {
     return assets[id]
   }
 
-  function _traverseShape(data: any, parentId: string, node?: cc.DrawNode, d?: any) {
+  function _traverseShape(data: any, parentId: string, id?: string, d?: any) {
     switch (data.ty) {
       case Shape.group: {
-        const node = new cc.DrawNode()
+        const id = v4()
+        options.createDrawNode(id, parentId)
         const d = {
           width: 0,
-          color: cc.color('#fff'),
+          color: { r: 0, g: 0, b: 0, a: 0 },
           data: [],
         }
         for (let item of data.it) {
-          _traverseShape(item, parentId, node, d)
+          _traverseShape(item, parentId, id, d)
         }
         d.data.forEach((item: any[]) => {
-          // console.log(item)
-          node.drawCubicBezier(item[0], item[1], item[2], item[3], 100, d.width, d.color)
+          options.drawCubicBezier(id, item[0], item[1], item[2], item[3], d.width, d.color)
         })
-        options.getNode(parentId).addChild(node)
       }
       case Shape.stroke: {
-        if (node) {
+        if (id) {
           const [r, g, b, a] = (data.c.k as any[]).map(x => x * 255)
-          d.color = cc.color(r, g, b, a)
+          d.color = { r, g, b, a }
           d.width = data.w.k
         }
       }
       case Shape.shape: {
-        if (node && d) {
+        if (id && d) {
           const c = (x: any) => {
             const { i, o, v } = x
             const parentNode = options.getNode(parentId)
-            // node.drawDots(v.map((x: any) => cc.p(x[0], x[1])), 10, cc.color('#ff0'))
 
             d.data = []
             for (let j = 0; j < v.length - 1; j++) {
@@ -163,19 +140,19 @@ export function traverse(data: any, containerId: string, options: Options) {
     dropDown = 7,
   }
 
-  function _traverseEffect(data: any, parentId: string, node: cc.DrawNode) {
-    switch (data.ty) {
-      case Effect.group: {
-        if (data.mn === 'ADBE Gaussian Blur 2') {
-        }
-        for (let item of data.ef) {
-          _traverseEffect(item, parentId, node)
-        }
-      }
-      case Effect.dropDown: {
-      }
-    }
-  }
+  // function _traverseEffect(data: any, parentId: string, node: cc.DrawNode) {
+  //   switch (data.ty) {
+  //     case Effect.group: {
+  //       if (data.mn === 'ADBE Gaussian Blur 2') {
+  //       }
+  //       for (let item of data.ef) {
+  //         _traverseEffect(item, parentId, node)
+  //       }
+  //     }
+  //     case Effect.dropDown: {
+  //     }
+  //   }
+  // }
 
   function _applyAnchor(layer: any, id: string, width: number, height: number) {}
 
@@ -188,8 +165,6 @@ export function traverse(data: any, containerId: string, options: Options) {
     st: number,
     options: Options
   ) {
-    const delay = cc.delayTime(getTime(st))
-
     const parseK = (k: any[]) => {
       return k.reduceRight(
         (result, item, i) => {
@@ -221,69 +196,44 @@ export function traverse(data: any, containerId: string, options: Options) {
     if (layer.ks.a && layer.ks.a.k) {
       const [x, y] = layer.ks.a.k
       if (typeof x === 'number' && typeof y === 'number') {
-        // let { w = 10000, h = 10000 } = layer // FIXME:
         options.setAnchorPoint(id, x / width, 1 - y / height)
-        console.log(id, x, y, height)
+      } else {
+        console.log('Anchor error: ', id, layer.ks.a)
       }
     }
 
     // position
     if (layer.ks.p) {
+      const parentHeight = options.getNode(parentId).height
+
       if (typeof layer.ks.p.k[0] === 'number') {
         var [x, y] = layer.ks.p.k
-        options.setPosition(id, parentId, x, y)
+        options.setPosition(id, x, parentHeight - y)
       } else if (layer.ks.p.k.length) {
-        let a: any = []
-        const parentHeight = options.getNode(parentId).height
-        options.setPosition(id, parentId, layer.ks.p.k[0].s[0], layer.ks.p.k[0].s[1])
-        parseK(layer.ks.p.k).arr.forEach((x: any) => {
-          a.push(
-            cc.moveTo(x.startTime, cc.p(x.s[0], parentHeight - x.s[1])),
-            cc.bezierTo(x.t, [
-              cc.p(x.s[0] + x.to[0], parentHeight - (x.s[1] + x.to[1])),
-              cc.p(x.ti[0] + x.e[0], parentHeight - (x.ti[1] + x.e[1])),
-              cc.p(x.e[0], parentHeight - x.e[1]),
-            ])
-          )
-        })
-        a.unshift(delay)
-        options.getNode(id).runAction(cc.sequence(a))
+        options.setPosition(id, layer.ks.p.k[0].s[0], parentHeight - layer.ks.p.k[0].s[1])
+        options.positionAnimate(id, parseK(layer.ks.p.k).arr, getTime(st), parentHeight)
       }
     }
 
     // rotation
     if (layer.ks.r && layer.ks.r.k) {
       if (typeof layer.ks.r.k === 'number') {
-        options.getNode(id).setRotation(layer.ks.r.k)
+        options.setRotation(id, layer.ks.r.k)
       } else if (typeof layer.ks.r.k[0] === 'number') {
-        options.getNode(id).setRotation(layer.ks.r.k[0])
+        options.setRotation(id, layer.ks.r.k[0])
       } else {
-        // console.log(layer.ks.r.k)
-        let a: any = []
-        options.getNode(id).setRotation(layer.ks.r.k[0].s[0])
-        parseK(layer.ks.r.k).arr.forEach((x: any) => {
-          a.push(cc.rotateTo(x.startTime, x.s[0]), cc.rotateTo(x.t, x.e[0]))
-        })
-        a.unshift(delay)
-        options.getNode(id).runAction(cc.sequence(a))
+        options.setRotation(id, layer.ks.r.k[0].s[0])
+        options.rotationAnimate(id, parseK(layer.ks.r.k).arr, getTime(st))
       }
     }
 
     // scale
     if (layer.ks.s) {
       if (typeof layer.ks.s.k[0] === 'number') {
-        options.getNode(id).setScale(layer.ks.s.k[0] / 100, layer.ks.s.k[1] / 100)
+        options.setScale(id, layer.ks.s.k[0] / 100, layer.ks.s.k[1] / 100)
       } else {
-        let a: any = []
-        options.getNode(id).setScale(layer.ks.s.k[0].s[0] / 100, layer.ks.s.k[0].s[1] / 100)
-        parseK(layer.ks.s.k).arr.forEach((x: any) => {
-          a.push(
-            cc.scaleTo(x.startTime, x.s[0] / 100, x.s[1] / 100),
-            cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100)
-          )
-        })
-        a.unshift(delay)
-        options.getNode(id).runAction(cc.sequence(a))
+        options.setScale(id, layer.ks.s.k[0].s[0] / 100, layer.ks.s.k[0].s[1] / 100)
+        options.scaleAnimate(id, parseK(layer.ks.s.k).arr, getTime(st))
       }
     }
   }
