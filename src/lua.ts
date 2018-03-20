@@ -4,7 +4,7 @@
 import { traverse } from './traverse'
 import { Color } from './types'
 
-export function lua(data: any) {
+export function lua(data: any, containerId: string) {
   let code = ''
 
   const append = (str: string) => {
@@ -19,19 +19,7 @@ export function lua(data: any) {
     return `cc.c4f(${r}, ${g}, ${b}, ${a})`
   }
 
-  append(`
-    local data = {}
-    local ratio = display.height / ${data.h}
-
-    local g = display.newLayer()
-    g:setContentSize(${data.w}, ${data.h})
-    g:setScale(ratio)
-    g:ignoreAnchorPointForPosition(false)
-    g:setAnchorPoint(cc.p(0, 1))
-    g:setPosition(cc.p(0, ${data.h} * ratio))
-  `)
-
-  traverse(data, 'g', true, {
+  traverse(data, containerId, true, {
     createLayer(id, width, height) {
       append(`local ${id} = cc.Layer:create()`)
       append(`${id}:setContentSize(${width}, ${height})`)
