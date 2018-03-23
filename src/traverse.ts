@@ -1,9 +1,8 @@
-import { v4 } from 'uuid'
+// import { v4 } from 'uuid'
 import { Options, Layer, Shape, Effect } from './types'
 /// <reference path="../typings/cocos2d/cocos2d-lib.d.ts" />
 
-// declare var uuid: any
-// const { v4 } = uuid
+const { v4 } = (window as any).uuid
 const genId = () => 'v' + v4().replace(/-/g, '_F') // for lua variables
 
 export function traverse(
@@ -63,6 +62,7 @@ export function traverse(
             d.color,
           )
         })
+        // options.curveAnimate(id, 10, { r: 255, g: 0, b: 0, a: 255 }, d.data)
       }
       case Shape.stroke: {
         if (id) {
@@ -91,9 +91,9 @@ export function traverse(
           if (data.ks) {
             if (data.ks.a) {
               c(data.ks.k[0].s[0])
-
               // animation
               // FIXME: shape animation
+              // d.data = data.ks.k[0]
             } else {
               c(data.ks.k)
             }
@@ -273,11 +273,10 @@ export function traverse(
 
         break
       }
+      case Layer.null:
       case Layer.precomp: {
-        const id = layer.refId
-        const asset = getAsset(id)
-
-        if (!asset) break
+        const id = layer.refId || genId()
+        layer.xid = id
 
         // precomp
         options.createLayer(id, layer.w, layer.h)
@@ -313,7 +312,8 @@ export function traverse(
           }
         }
 
-        if (asset.layers) {
+        const asset = getAsset(id)
+        if (asset && asset.layers) {
           // FIXME: parent before child
           const sortedLayers = []
           const indexIdMapping: any = {}
@@ -323,13 +323,13 @@ export function traverse(
             } else {
               sortedLayers.unshift(l)
             }
-            if (l.refId && l.ind) {
+            if (l.ind) {
               indexIdMapping[l.ind] = l
             }
           }
 
           for (let l of sortedLayers) {
-            const correctId = l.parent ? indexIdMapping[l.parent].refId : id
+            const correctId = l.parent ? indexIdMapping[l.parent].xid : id
             const parentWidth = (l.parent ? indexIdMapping[l.parent] : layer).w
             const parentHeight = (l.parent ? indexIdMapping[l.parent] : layer).h
             _traverseLayer(
