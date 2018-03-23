@@ -330,8 +330,8 @@ export function traverse(
 
           for (let l of sortedLayers) {
             const correctId = l.parent ? indexIdMapping[l.parent].xid : id
-            const parentWidth = (l.parent ? indexIdMapping[l.parent] : layer).w
-            const parentHeight = (l.parent ? indexIdMapping[l.parent] : layer).h
+            const parentWidth = (l.parent ? indexIdMapping[l.parent] : layer).w || 0
+            const parentHeight = (l.parent ? indexIdMapping[l.parent] : layer).h || 0
             _traverseLayer(
               l,
               correctId,
