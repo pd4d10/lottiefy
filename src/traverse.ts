@@ -89,7 +89,7 @@ export function traverse(
             }
           }
           if (data.ks) {
-            if (data.ks.a) {
+            if (Array.isArray(data.ks.k)) {
               c(data.ks.k[0].s[0])
               // animation
               // FIXME: shape animation
