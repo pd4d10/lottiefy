@@ -171,47 +171,40 @@ export function traverse(
 
     // position
     if (layer.ks.p) {
-      if (typeof layer.ks.p.k[0] === 'number') {
-        var [x, y] = layer.ks.p.k
+      const { k } = layer.ks.p
+      if (typeof k[0] === 'number') {
+        var [x, y] = k
         options.setPosition(id, x, parentHeight - y)
-      } else if (layer.ks.p.k.length) {
-        options.setPosition(
-          id,
-          layer.ks.p.k[0].s[0],
-          parentHeight - layer.ks.p.k[0].s[1],
-        )
-        options.positionAnimate(
-          id,
-          parseK(layer.ks.p.k).arr,
-          getTime(st),
-          parentHeight,
-        )
+      } else if (k.length) {
+        const [x, y] = k[0].s
+        options.setPosition(id, x, parentHeight - y)
+        options.positionAnimate(id, parseK(k).arr, getTime(st), parentHeight)
       }
     }
 
     // rotation
     if (layer.ks.r && layer.ks.r.k) {
-      if (typeof layer.ks.r.k === 'number') {
-        options.setRotation(id, layer.ks.r.k)
-      } else if (typeof layer.ks.r.k[0] === 'number') {
-        options.setRotation(id, layer.ks.r.k[0])
+      const { k } = layer.ks.r
+      if (typeof k === 'number') {
+        options.setRotation(id, k)
+      } else if (typeof k[0] === 'number') {
+        options.setRotation(id, k[0])
       } else {
-        options.setRotation(id, layer.ks.r.k[0].s[0])
-        options.rotationAnimate(id, parseK(layer.ks.r.k).arr, getTime(st))
+        options.setRotation(id, k[0].s[0])
+        options.rotationAnimate(id, parseK(k).arr, getTime(st))
       }
     }
 
     // scale
     if (layer.ks.s) {
-      if (typeof layer.ks.s.k[0] === 'number') {
-        options.setScale(id, layer.ks.s.k[0] / 100, layer.ks.s.k[1] / 100)
+      const { k } = layer.ks.s
+      if (typeof k[0] === 'number') {
+        const [x, y] = k
+        options.setScale(id, x / 100, y / 100)
       } else {
-        options.setScale(
-          id,
-          layer.ks.s.k[0].s[0] / 100,
-          layer.ks.s.k[0].s[1] / 100,
-        )
-        options.scaleAnimate(id, parseK(layer.ks.s.k).arr, getTime(st))
+        const [x, y] = k[0].s
+        options.setScale(id, x / 100, y / 100)
+        options.scaleAnimate(id, parseK(k).arr, getTime(st))
       }
     }
   }
@@ -256,7 +249,12 @@ export function traverse(
         const asset = getAsset(id)
         if (!asset) break
         // TODO: sprite frame
-        options.createSprite(id, (useSpriteFrame ? '' : asset.u) + asset.p)
+        options.createSprite(
+          id,
+          (useSpriteFrame ? '' : asset.u) + asset.p,
+          asset.w,
+          asset.h,
+        )
         options.setContentSize(id, asset.w, asset.h)
         options.addChild(id, parentId)
         _applyTransform(
@@ -330,8 +328,10 @@ export function traverse(
 
           for (let l of sortedLayers) {
             const correctId = l.parent ? indexIdMapping[l.parent].xid : id
-            const parentWidth = (l.parent ? indexIdMapping[l.parent] : layer).w || 0
-            const parentHeight = (l.parent ? indexIdMapping[l.parent] : layer).h || 0
+            const parentWidth =
+              (l.parent ? indexIdMapping[l.parent] : layer).w || 0
+            const parentHeight =
+              (l.parent ? indexIdMapping[l.parent] : layer).h || 0
             _traverseLayer(
               l,
               correctId,
