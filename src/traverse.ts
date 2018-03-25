@@ -276,27 +276,23 @@ export function traverse(
         const id = layer.refId || genId()
         layer.xid = id
 
-        // precomp
-        options.createLayer(id, layer.w, layer.h)
-
-        // size
-        // options.setContentSize(id, layer.w || asset.w, layer.h || asset.h)
-
-        if (layer.ks.s && layer.ks.s.k) {
-          const [x, y] = layer.ks.s.k
-          if (typeof x === 'number' && typeof y === 'number') {
+        const getLayerWidthAndHeight = (l: any) => {
+          if (l.ty === Layer.null) {
+            // FIXME: Assume null layer's width and height
+            return l.ks.a.k.map((x: number) => x * 2)
+          } else {
+            return [l.w, l.h]
           }
         }
-
-        if (layer.ks.o) {
-        }
+        const [width, height] = getLayerWidthAndHeight(layer)
+        options.createLayer(id, width, height)
 
         _applyTransform(
           layer,
           id,
           parentId,
-          layer.w,
-          layer.h,
+          width,
+          height,
           parentWidth,
           parentHeight,
           st,
@@ -327,11 +323,17 @@ export function traverse(
           }
 
           for (let l of sortedLayers) {
-            const correctId = l.parent ? indexIdMapping[l.parent].xid : id
-            const parentWidth =
-              (l.parent ? indexIdMapping[l.parent] : layer).w || 0
-            const parentHeight =
-              (l.parent ? indexIdMapping[l.parent] : layer).h || 0
+            let correctId, parentWidth, parentHeight
+            if (l.parent) {
+              const parent = indexIdMapping[l.parent]
+              correctId = parent.xid
+              ;[parentWidth, parentHeight] = getLayerWidthAndHeight(parent)
+            } else {
+              correctId = id
+              parentWidth = width
+              parentHeight = height
+            }
+
             _traverseLayer(
               l,
               correctId,
