@@ -1,8 +1,9 @@
 {
-  "name": "lottie-cocos",
+  "name": "lottie-cocos2dx",
   "version": "0.0.1",
-  "description": "",
+  "description": "Render After Effects animations on Cocos2d-x engine",
   "main": "index.js",
+  "files": [],
   "scripts": {
     "start": "rollup -cw",
     "watch": "tsc --watch",
@@ -10,24 +11,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pd4d10/lottie-cocos.git"
+    "url": "git+https://github.com/pd4d10/lottie-cocos2dx.git"
   },
   "keywords": [],
   "author": "Rongjian Zhang <pd4d10@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pd4d10/lottie-cocos/issues"
+    "url": "https://github.com/pd4d10/lottie-cocos2dx/issues"
   },
-  "homepage": "https://github.com/pd4d10/lottie-cocos#readme",
+  "homepage": "https://github.com/pd4d10/lottie-cocos2dx",
   "dependencies": {
     "@types/uuid": "^3.4.3",
-    "typescript": "^2.7.2",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
     "rollup": "^0.56.5",
     "rollup-plugin-commonjs": "^9.0.0",
     "rollup-plugin-node-resolve": "^3.2.0",
-    "rollup-plugin-typescript2": "^0.12.0"
+    "rollup-plugin-typescript2": "^0.12.0",
+    "typescript": "^2.7.2"
   }
 }
