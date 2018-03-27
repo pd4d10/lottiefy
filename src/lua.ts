@@ -100,6 +100,24 @@ export function lua(data: any, containerId: string) {
     },
     getNode(id) {},
 
+    setOpacity(id, opacity) {
+      append(`${id}:setOpacity(${opacity})`)
+    },
+    fadeTo(id, data, delay) {
+      let a: any = []
+      data.forEach((x: any) => {
+        a.push(
+          `cc.FadeTo:create(${x.startTime}, ${x.s[0] * 2.55})`,
+          `cc.FadeTo:create(${x.t}, ${x.e[0] * 2.55})`,
+        )
+      })
+      a.unshift(`cc.DelayTime:create(${delay})`)
+      append(
+        `table.insert(data, {node=${id},action=cc.Sequence:create({${a.join(
+          ',',
+        )}})})`,
+      )
+    },
     createDrawNode(id, parentId, width) {
       append(`local ${id} = cc.DrawNode:create(${width})`)
       append(`${parentId}:addChild(${id})`)
