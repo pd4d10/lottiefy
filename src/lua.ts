@@ -5,7 +5,7 @@ import { traverse } from './traverse'
 import { Color } from './types'
 
 export function lua(data: any, containerId: string) {
-  let code = ''
+  let code = `local t = {}`
 
   const append = (str: string) => {
     code += str + '\n'
@@ -21,14 +21,14 @@ export function lua(data: any, containerId: string) {
 
   traverse(data, containerId, true, {
     createLayer(id, width, height) {
-      append(`local ${id} = cc.Layer:create()`)
-      append(`${id}:setContentSize(${width}, ${height})`)
+      append(`t['${id}'] = cc.Layer:create()`)
+      append(`t['${id}']:setContentSize(${width}, ${height})`)
     },
     createSprite(id, name) {
-      append(`local ${id} = display.newSprite("#${name}")`)
+      append(`t['${id}'] = display.newSprite("#${name}")`)
     },
     setPosition(id, x, y) {
-      append(`${id}:setPosition(cc.p(${x}, ${y}))`)
+      append(`t['${id}']:setPosition(cc.p(${x}, ${y}))`)
     },
     positionAnimate(id, data, delay, parentHeight) {
       const a: any[] = []
@@ -45,13 +45,13 @@ export function lua(data: any, containerId: string) {
       })
       a.unshift(`cc.DelayTime:create(${delay})`)
       append(
-        `table.insert(data, {node=${id},action=cc.Sequence:create({${a.join(
+        `table.insert(data, {node=t['${id}'],action=cc.Sequence:create({${a.join(
           ',',
         )}})})`,
       )
     },
     setRotation(id, rotation) {
-      append(`${id}:setRotation(${rotation})`)
+      append(`t['${id}']:setRotation(${rotation})`)
     },
     rotationAnimate(id, data, delay) {
       let a: any = []
@@ -63,14 +63,14 @@ export function lua(data: any, containerId: string) {
       })
       a.unshift(`cc.DelayTime:create(${delay})`)
       append(
-        `table.insert(data, {node=${id},action=cc.Sequence:create({${a.join(
+        `table.insert(data, {node=t['${id}'],action=cc.Sequence:create({${a.join(
           ',',
         )}})})`,
       )
     },
     setScale(id, x, y) {
-      append(`${id}:setScaleX(${x})`)
-      append(`${id}:setScaleY(${y})`)
+      append(`t['${id}']:setScaleX(${x})`)
+      append(`t['${id}']:setScaleY(${y})`)
     },
     scaleAnimate(id, data, delay) {
       let a: any = []
@@ -82,26 +82,27 @@ export function lua(data: any, containerId: string) {
       })
       a.unshift(`cc.DelayTime:create(${delay})`)
       append(
-        `table.insert(data, {node=${id},action=cc.Sequence:create({${a.join(
+        `table.insert(data, {node=t['${id}'],action=cc.Sequence:create({${a.join(
           ',',
         )}})})`,
       )
     },
     setContentSize(id, width, height) {
-      append(`${id}:setContentSize(${width}, ${height})`)
+      append(`t['${id}']:setContentSize(${width}, ${height})`)
     },
     setAnchorPoint(id, x, y) {
-      append(`${id}:ignoreAnchorPointForPosition(false)
-    ${id}:setAnchorPoint(cc.p(${x}, ${y}))`)
+      append(`t['${id}']:ignoreAnchorPointForPosition(false)
+      t['${id}']:setAnchorPoint(cc.p(${x}, ${y}))`)
     },
     moveTo(id, parentId, time, x, y) {},
     addChild(id, parentId, localZOrder) {
-      append(`${parentId}:addChild(${id})`)
+      const c = parentId === 'g' ? 'g' : `t['${parentId}']`
+      append(`${c}:addChild(t['${id}'])`)
     },
     getNode(id) {},
 
     setOpacity(id, opacity) {
-      append(`${id}:setOpacity(${opacity})`)
+      append(`t['${id}']:setOpacity(${opacity})`)
     },
     fadeTo(id, data, delay) {
       let a: any = []
@@ -113,18 +114,18 @@ export function lua(data: any, containerId: string) {
       })
       a.unshift(`cc.DelayTime:create(${delay})`)
       append(
-        `table.insert(data, {node=${id},action=cc.Sequence:create({${a.join(
+        `table.insert(data, {node=t['${id}'],action=cc.Sequence:create({${a.join(
           ',',
         )}})})`,
       )
     },
     createDrawNode(id, parentId, width) {
-      append(`local ${id} = cc.DrawNode:create(${width})`)
-      append(`${parentId}:addChild(${id})`)
+      append(`t['${id}'] = cc.DrawNode:create(${width})`)
+      append(`t['${parentId}']:addChild(t['${id}'])`)
     },
     drawCubicBezier(id, origin, c1, c2, dest, width, color) {
       append(
-        `${id}:drawCubicBezier(${convertPoint([
+        `t['${id}']:drawCubicBezier(${convertPoint([
           origin,
           c1,
           c2,
