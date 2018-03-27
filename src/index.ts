@@ -5,28 +5,17 @@ import { traverse } from './traverse'
 export default function lottie(data: any, g: any) {
   const layers: { [id: string]: cc.Layer | cc.Sprite | cc.DrawNode } = {}
 
-  // const container = new cc.LayerColor(cc.color(0, 0, 255, 100), 1080, 1920)
-  const container = new cc.LayerColor(cc.color(0, 0, 0, 0), 1080, 1920)
-  // container.setContentSize(100, 100)
-  // container.ignoreAnchorPointForPosition(false)
-  // container.setAnchorPoint(0.5, 0.5)
-
-  // container.setPosition(0, cc.winSize.height)
-  // container.setPosition(cc.winSize.width / 2, cc.winSize.height / 2)
-  // container.setScale(0.4)
-  // container.setPosition(500, 500)
-  // window.g = globalLayer
-  // container.setScale(cc.winSize.height / 1920)
+  const container = new cc.LayerColor(cc.color(0, 0, 0, 0), data.w, data.h)
+  // container.setScale(0.5)
   const containerId = 'xxxxx'
   layers[containerId] = container
   g.addChild(container)
   ;(window as any).c = container
-  let ii = 0
 
   traverse(data, containerId, false, {
     createLayer(id, width, height) {
-      // layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 40), width, height)
-      layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
+      // layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 30), width, height)
+      layers[id] = new cc.LayerColor(cc.color(255, 0, 0, 0), width, height)
     },
     createSprite(id, name) {
       // layers[id] = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(name))
@@ -93,6 +82,21 @@ export default function lottie(data: any, g: any) {
     },
     getNode(id) {
       return layers[id]
+    },
+    setOpacity(id, opacity) {
+      // layers[id].setCascadeOpacityEnabled(true)
+      layers[id].setOpacity(opacity)
+    },
+    fadeTo(id, data, delay) {
+      let a: any = []
+      data.forEach((x: any) => {
+        a.push(
+          cc.fadeTo(x.startTime, x.s[0] * 2.55),
+          cc.fadeTo(x.t, x.e[0] * 2.55),
+        )
+      })
+      a.unshift(cc.delayTime(delay))
+      layers[id].runAction(cc.sequence(a))
     },
 
     createDrawNode(id, parentId) {

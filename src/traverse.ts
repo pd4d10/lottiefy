@@ -159,6 +159,18 @@ export function traverse(
       )
     }
 
+    // Opacity
+    if (layer.ks.o) {
+      const { k } = layer.ks.o
+      if (typeof k === 'number') {
+        options.setOpacity(id, k * 2.55)
+      } else if (k.length) {
+        const opacity = k[0].s[0]
+        options.setOpacity(id, opacity * 2.55)
+        options.fadeTo(id, parseK(k).arr, getTime(st))
+      }
+    }
+
     // anchor
     if (layer.ks.a && layer.ks.a.k) {
       const [x, y] = layer.ks.a.k

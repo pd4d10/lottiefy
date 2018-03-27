@@ -1,6 +1,6 @@
 export interface Options {
   createLayer(id: string, width?: number, height?: number): any
-  createSprite(id: string, name: string): any
+  createSprite(id: string, name: string, width: number, height: number): any
   setPosition(id: string, x: number, y: number): any
   positionAnimate(
     id: string,
@@ -17,6 +17,8 @@ export interface Options {
   setContentSize(id: string, width: number, height: number): any
   addChild(id: string, parentId: string, localZOrder?: number): any
   getNode(id: string): any
+  setOpacity(id: string, opacity: number): void
+  fadeTo(id: string, data: any[], delay: number): void
 
   createDrawNode(id: string, parentId: string, width: number): any
   drawCubicBezier(
