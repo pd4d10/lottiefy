@@ -1,7 +1,9 @@
 import { v4 } from 'uuid'
 import { Options, Layer, Shape, Effect, Color } from './types'
 
-const genId = () => 'v' + v4().replace(/-/g, '_F') // for lua variables
+const genId = (nm?: string) => {
+  return (nm || 'v') + '_' + v4().replace(/-/g, '_') // for lua variables
+}
 
 function convertColor(c: Color) {
   return c.map(n => n * 255)
@@ -277,7 +279,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
       }
       case Layer.null:
       case Layer.precomp: {
-        const id = layer.refId || genId()
+        const id = genId(layer.refId)
         layer.xid = id
 
         const getLayerWidthAndHeight = (l: any) => {
