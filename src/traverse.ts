@@ -174,7 +174,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
     }
 
     // Opacity
-    if (layer.ks.o && ['背景色'].some(x => layer.nm.includes(x))) {
+    if (layer.ks.o) {
       console.log(layer.nm)
       const { k } = layer.ks.o
       if (typeof k === 'number') {
@@ -245,9 +245,6 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
     parentHeight: number,
   ) {
     // console.log(layer.nm)
-    if (['光边', '暗'].some(x => layer.nm.includes(x))) {
-      return
-    }
 
     switch (layer.ty) {
       case Layer.shape: {
