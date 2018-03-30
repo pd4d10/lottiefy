@@ -1,8 +1,6 @@
-// import { v4 } from 'uuid'
+import { v4 } from 'uuid'
 import { Options, Layer, Shape, Effect, Color } from './types'
-/// <reference path="../typings/cocos2d/cocos2d-lib.d.ts" />
 
-const { v4 } = (window as any).uuid
 const genId = () => 'v' + v4().replace(/-/g, '_F') // for lua variables
 
 function convertColor(c: Color) {
@@ -56,9 +54,9 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
         })
         if (d.ellipse) {
           let [x, y] = d.transform.p.k
-          const center = { x, y }
+          const center = { x, y: -y }
           const [rx, ry] = d.ellipse.s.k
-          options.drawEllipse(id, center, rx, ry, 1, 100, true, d.stroke.width, d.stroke.color, d.fill.color)
+          options.drawEllipse(id, center, rx, ry, 0, 100, true, d.stroke.width, d.stroke.color, d.fill.color)
         }
 
         break
@@ -253,7 +251,8 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
       case Layer.shape: {
         const id = genId()
         // same width and height as parent
-        options.createLayer(id, parentWidth, parentHeight)
+        // options.createLayer(id, parentWidth, parentHeight)
+        options.createLayer(id, 0, 0)
         _applyTransform(layer, id, parentId, parentWidth, parentHeight, parentWidth, parentHeight, st, options)
         options.addChild(id, parentId)
         for (let shape of layer.shapes) {

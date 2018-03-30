@@ -128,8 +128,8 @@ export default function lottie(data: any, g: any) {
         _vertices.length = 0
         for (i = 0; i <= segments; i++) {
           var rads = i * coef
-          var j = rx * Math.cos(rads + angle) + center.x
-          var k = ry * Math.sin(rads + angle) + center.y
+          var j = rx * Math.cos(rads + angle) / 2 + center.x
+          var k = ry * Math.sin(rads + angle) / 2 + center.y
           _vertices.push(j, k)
         }
         if (drawLineToCenter) _vertices.push(center.x, center.y)
