@@ -2,12 +2,7 @@ export interface Options {
   createLayer(id: string, width?: number, height?: number): any
   createSprite(id: string, name: string, width: number, height: number): any
   setPosition(id: string, x: number, y: number): any
-  positionAnimate(
-    id: string,
-    data: any[],
-    delay: number,
-    parentHeight: number,
-  ): any
+  positionAnimate(id: string, data: any[], delay: number, parentHeight: number): any
   setAnchorPoint(id: string, x: number, y: number): any
   setRotation(id: string, rotation: number): any
   rotationAnimate(id: string, data: any[], delay: number): any
@@ -30,14 +25,11 @@ export interface Options {
     width: number,
     color: Color,
   ): any
+  drawEllipse(id: string, ...args: any[]): void
+  curveAnimate(id: string, width: number, color: Color, config: any): any
 }
 
-export type Color = {
-  r: number
-  g: number
-  b: number
-  a: number
-}
+export type Color = [number, number, number, number]
 
 export enum Layer {
   precomp = 0,
@@ -54,6 +46,8 @@ export enum Shape {
   shape = 'sh',
   transform = 'tr',
   stroke = 'st',
+  fill = 'fl',
+  merge = 'mm',
 }
 
 export enum Effect {

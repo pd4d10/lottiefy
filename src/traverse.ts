@@ -1,16 +1,15 @@
 // import { v4 } from 'uuid'
-import { Options, Layer, Shape, Effect } from './types'
+import { Options, Layer, Shape, Effect, Color } from './types'
 /// <reference path="../typings/cocos2d/cocos2d-lib.d.ts" />
 
 const { v4 } = (window as any).uuid
 const genId = () => 'v' + v4().replace(/-/g, '_F') // for lua variables
 
-export function traverse(
-  data: any,
-  containerId: string,
-  useSpriteFrame: boolean,
-  options: Options,
-) {
+function convertColor(c: Color) {
+  return c.map(n => n * 255)
+}
+
+export function traverse(data: any, containerId: string, useSpriteFrame: boolean, options: Options) {
   const getTime = (time: number) => time / data.fr
   // const getTime = (time: number) => time
 
@@ -41,35 +40,38 @@ export function traverse(
     switch (data.ty) {
       case Shape.group: {
         const id = genId()
-        const d = {
+        const d: any = {
           id,
-          width: 0,
-          color: { r: 0, g: 0, b: 0, a: 0 },
-          data: [],
+          stroke: null,
+          shape: [],
+          ellipse: null,
+          transform: null,
         }
         for (let item of data.it) {
           _traverseShape(item, parentId, parentWidth, parentHeight, id, d)
         }
-        options.createDrawNode(id, parentId, d.width)
-        d.data.forEach((item: any[]) => {
-          options.drawCubicBezier(
-            id,
-            item[0],
-            item[1],
-            item[2],
-            item[3],
-            d.width,
-            d.color,
-          )
+        options.createDrawNode(id, parentId, d.stroke.width)
+        d.shape.forEach((item: any[]) => {
+          options.drawCubicBezier(id, item[0], item[1], item[2], item[3], d.stroke.width, d.stroke.color)
         })
+        if (d.ellipse) {
+          let [x, y] = d.transform.p.k
+          const center = { x, y }
+          const [rx, ry] = d.ellipse.s.k
+          options.drawEllipse(id, center, rx, ry, 1, 100, true, d.stroke.width, d.stroke.color, d.fill.color)
+        }
+
+        break
         // options.curveAnimate(id, 10, { r: 255, g: 0, b: 0, a: 255 }, d.data)
       }
       case Shape.stroke: {
         if (id) {
-          const [r, g, b, a] = (data.c.k as any[]).map(x => x * 255)
-          d.color = { r, g, b, a }
-          d.width = data.w.k
+          d.stroke = {
+            width: data.w.k,
+            color: convertColor(data.c.k),
+          }
         }
+        break
       }
       case Shape.shape: {
         if (id && d) {
@@ -99,7 +101,24 @@ export function traverse(
             }
           }
         }
+        break
       }
+      case Shape.transform:
+        d.transform = data
+        break
+      case Shape.ellipse:
+        d.ellipse = data
+        break
+      case Shape.fill:
+        d.fill = {
+          color: convertColor(data.c.k),
+          opacity: data.o.k,
+        }
+        break
+      case Shape.merge:
+        break
+      default:
+        console.log(data.ty)
     }
   }
 
@@ -117,12 +136,7 @@ export function traverse(
   //   }
   // }
 
-  function _applyAnchor(
-    layer: any,
-    id: string,
-    width: number,
-    height: number,
-  ) {}
+  function _applyAnchor(layer: any, id: string, width: number, height: number) {}
 
   function _applyTransform(
     layer: any,
@@ -160,7 +174,8 @@ export function traverse(
     }
 
     // Opacity
-    if (layer.ks.o) {
+    if (layer.ks.o && ['背景色'].some(x => layer.nm.includes(x))) {
+      console.log(layer.nm)
       const { k } = layer.ks.o
       if (typeof k === 'number') {
         options.setOpacity(id, k * 2.55)
@@ -230,23 +245,16 @@ export function traverse(
     parentHeight: number,
   ) {
     // console.log(layer.nm)
+    if (['光边', '暗'].some(x => layer.nm.includes(x))) {
+      return
+    }
 
     switch (layer.ty) {
       case Layer.shape: {
         const id = genId()
         // same width and height as parent
         options.createLayer(id, parentWidth, parentHeight)
-        _applyTransform(
-          layer,
-          id,
-          parentId,
-          parentWidth,
-          parentHeight,
-          parentWidth,
-          parentHeight,
-          st,
-          options,
-        )
+        _applyTransform(layer, id, parentId, parentWidth, parentHeight, parentWidth, parentHeight, st, options)
         options.addChild(id, parentId)
         for (let shape of layer.shapes) {
           _traverseShape(shape, id, parentWidth, parentHeight)
@@ -261,25 +269,10 @@ export function traverse(
         const asset = getAsset(id)
         if (!asset) break
         // TODO: sprite frame
-        options.createSprite(
-          id,
-          (useSpriteFrame ? '' : asset.u) + asset.p,
-          asset.w,
-          asset.h,
-        )
+        options.createSprite(id, (useSpriteFrame ? '' : asset.u) + asset.p, asset.w, asset.h)
         options.setContentSize(id, asset.w, asset.h)
         options.addChild(id, parentId)
-        _applyTransform(
-          layer,
-          id,
-          parentId,
-          asset.w,
-          asset.h,
-          parentWidth,
-          parentHeight,
-          st,
-          options,
-        )
+        _applyTransform(layer, id, parentId, asset.w, asset.h, parentWidth, parentHeight, st, options)
 
         break
       }
@@ -299,17 +292,7 @@ export function traverse(
         const [width, height] = getLayerWidthAndHeight(layer)
         options.createLayer(id, width, height)
 
-        _applyTransform(
-          layer,
-          id,
-          parentId,
-          width,
-          height,
-          parentWidth,
-          parentHeight,
-          st,
-          options,
-        )
+        _applyTransform(layer, id, parentId, width, height, parentWidth, parentHeight, st, options)
 
         // effects
         if (layer.ef) {
@@ -346,14 +329,7 @@ export function traverse(
               parentHeight = height
             }
 
-            _traverseLayer(
-              l,
-              correctId,
-              options,
-              st + (layer.st || 0),
-              parentWidth,
-              parentHeight,
-            )
+            _traverseLayer(l, correctId, options, st + (layer.st || 0), parentWidth, parentHeight)
           }
         }
 
