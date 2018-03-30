@@ -2,6 +2,7 @@ const path = require('path')
 
 module.exports = {
   watch: true,
+  devtool: 'inline-source-map',
   output: {
     path: path.resolve('./dist'),
     filename: 'lottie-cocos2dx.js',
