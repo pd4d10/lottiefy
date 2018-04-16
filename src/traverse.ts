@@ -299,7 +299,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
           }
         }
 
-        const asset = getAsset(id)
+        const asset = getAsset(layer.refId)
         if (asset && asset.layers) {
           // FIXME: parent before child
           const sortedLayers = []
