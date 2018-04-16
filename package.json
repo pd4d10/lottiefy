@@ -25,6 +25,9 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-wrap": "^0.13.0",
     "rollup": "^0.56.5",
     "rollup-plugin-commonjs": "^9.0.0",
     "rollup-plugin-node-resolve": "^3.2.0",

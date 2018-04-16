@@ -1,0 +1,3 @@
+[submodule "lottie-web"]
+	path = lottie-web
+	url = https://github.com/airbnb/lottie-web.git
