@@ -119,11 +119,11 @@ var srcs = [
   'lottie-web/player/js/elements/htmlElements/HCameraElement.js',
   'lottie-web/player/js/elements/htmlElements/HEffects.js',
   'lottie-web/player/js/animation/AnimationManager.js',
+  'lottie-web/player/js/animation/AnimationItem.js',
 
   // Rewrite AnimationItem
   'next/rewriteAnimationItem.js',
 
-  'lottie-web/player/js/animation/AnimationItem.js',
   'lottie-web/player/js/utils/expressions/Expressions.js',
   'lottie-web/player/js/utils/expressions/ExpressionManager.js',
   'lottie-web/player/js/utils/expressions/ExpressionPropertyDecorator.js',
@@ -150,6 +150,6 @@ gulp.task('buildFull', function() {
     .pipe(gulp.dest('dist/'))
 })
 
-gulp.task('watch', function() {
+gulp.task('default', function() {
   return gulp.watch(['lottie-web/player/**/*', 'next/**/*'], ['buildFull'])
 })
