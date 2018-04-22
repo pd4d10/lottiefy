@@ -56,8 +56,6 @@ var srcs = [
   'lottie-web/player/js/renderers/BaseRenderer.js',
   'lottie-web/player/js/renderers/SVGRenderer.js',
 
-  'next/CCRenderer.js',
-
   'lottie-web/player/js/renderers/CanvasRenderer.js',
   'lottie-web/player/js/renderers/HybridRenderer.js',
   'lottie-web/player/js/mask.js',
@@ -83,12 +81,6 @@ var srcs = [
   'lottie-web/player/js/elements/CompElement.js',
   'lottie-web/player/js/elements/ImageElement.js',
   'lottie-web/player/js/elements/SolidElement.js',
-
-  'next/elements/CCBaseElement.js',
-  'next/elements/CCCompElement.js',
-  'next/elements/CCImageElement.js',
-  'next/elements/CCSolidElement.js',
-  'next/elements/CCTextElement.js',
 
   'lottie-web/player/js/elements/svgElements/SVGCompElement.js',
   'lottie-web/player/js/elements/svgElements/SVGTextElement.js',
@@ -122,7 +114,35 @@ var srcs = [
   'lottie-web/player/js/animation/AnimationItem.js',
 
   // Rewrite AnimationItem
+  // Should be placed after AnimationItem.js
   'next/rewriteAnimationItem.js',
+
+  'next/ccElements/CCEffects.js',
+  'next/ccElements/CCTextElement.js',
+  'next/ccElements/SVGCompElement.js',
+  'next/ccElements/CCBaseElement.js',
+  'next/ccElements/SVGShapeElement.js',
+  'next/ccElements/SVGBaseElement.js',
+  'next/ccElements/SVGEffects.js',
+  'next/ccElements/CCCompElement.js',
+  'next/ccElements/SVGTextElement.js',
+  'next/ccElements/CCShapeElement.js',
+  'next/shapes/CCStrokeStyleData.js',
+  'next/shapes/CCTransformData.js',
+  'next/shapes/CCGradientFillStyleData.js',
+  'next/shapes/CCStyleData.js',
+  'next/shapes/CCGradientStrokeStyleData.js',
+  'next/shapes/CCShapeData.js',
+  'next/shapes/CCFillStyleData.js',
+  'next/polyfill.js',
+  'next/CCRenderer.js',
+  'next/effects/CCProLevelsFilter.js',
+  'next/effects/CCMatte3Effect.js',
+  'next/effects/CCStrokeEffect.js',
+  'next/effects/CCFillFilter.js',
+  'next/effects/CCTintEffect.js',
+  'next/effects/CCDropShadowEffect.js',
+  'next/effects/CCTritoneFilter.js',
 
   'lottie-web/player/js/utils/expressions/Expressions.js',
   'lottie-web/player/js/utils/expressions/ExpressionManager.js',
@@ -147,7 +167,7 @@ gulp.task('buildFull', function() {
     .src(srcs)
     .pipe(concat('lottie.js'))
     .pipe(wrap(moduleWrap))
-    .pipe(gulp.dest('dist/'))
+    .pipe(gulp.dest('/Users/z/cc/src'))
 })
 
 gulp.task('default', function() {

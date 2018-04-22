@@ -26,3 +26,6 @@ mkdir next/shapes
 cp -r lottie-web/player/js/elements/helpers/shapes/SVG* next/shapes
 rename "s/SVG/CC/" next/shapes/SVG*
 gsed -i 's/SVG/CC/g' next/shapes/CC*
+
+# List all file
+find next -type f
