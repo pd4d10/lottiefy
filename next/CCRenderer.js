@@ -47,7 +47,7 @@ CCRenderer.prototype.createText = function (data) {
 };
 
 CCRenderer.prototype.createImage = function (data) {
-    return new IImageElement(data,this.globalData,this);
+    return new CCImageElement(data,this.globalData,this);
 };
 
 CCRenderer.prototype.createComp = function (data) {
