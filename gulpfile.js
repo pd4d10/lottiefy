@@ -11,6 +11,7 @@ var moduleWrap = fs.readFileSync('./lottie-web/player/js/module.js', 'utf8')
 moduleWrap = moduleWrap.replace('/*<%= contents %>*/', '<%= contents %>')
 moduleWrap = moduleWrap.replace('[[BM_VERSION]]', bm_version)
 
+// Order matters because `extendPrototype` copy functions of prototype
 var srcs = [
   'lottie-web/player/js/main.js',
   'lottie-web/player/js/utils/common.js',
@@ -38,6 +39,16 @@ var srcs = [
   'lottie-web/player/js/utils/shapes/ShapeCollection.js',
   'lottie-web/player/js/utils/shapes/DashProperty.js',
   'lottie-web/player/js/utils/shapes/GradientProperty.js',
+
+  // Shapes
+  'next/shapes/CCStrokeStyleData.js',
+  'next/shapes/CCTransformData.js',
+  'next/shapes/CCGradientFillStyleData.js',
+  'next/shapes/CCStyleData.js',
+  'next/shapes/CCGradientStrokeStyleData.js',
+  'next/shapes/CCShapeData.js',
+  'next/shapes/CCFillStyleData.js',
+
   'lottie-web/player/js/utils/imagePreloader.js',
   'lottie-web/player/js/utils/featureSupport.js',
   'lottie-web/player/js/utils/filters.js',
@@ -55,9 +66,12 @@ var srcs = [
   'lottie-web/player/js/utils/pooling/bezier_length_pool.js',
   'lottie-web/player/js/renderers/BaseRenderer.js',
   'lottie-web/player/js/renderers/SVGRenderer.js',
-
   'lottie-web/player/js/renderers/CanvasRenderer.js',
   'lottie-web/player/js/renderers/HybridRenderer.js',
+
+  // CCRenderers
+  'next/CCRenderer.js',
+
   'lottie-web/player/js/mask.js',
   'lottie-web/player/js/elements/helpers/HierarchyElement.js',
   'lottie-web/player/js/elements/helpers/FrameElement.js',
@@ -81,7 +95,6 @@ var srcs = [
   'lottie-web/player/js/elements/CompElement.js',
   'lottie-web/player/js/elements/ImageElement.js',
   'lottie-web/player/js/elements/SolidElement.js',
-
   'lottie-web/player/js/elements/svgElements/SVGCompElement.js',
   'lottie-web/player/js/elements/svgElements/SVGTextElement.js',
   'lottie-web/player/js/elements/svgElements/SVGShapeElement.js',
@@ -93,6 +106,16 @@ var srcs = [
   'lottie-web/player/js/elements/svgElements/effects/SVGDropShadowEffect.js',
   'lottie-web/player/js/elements/svgElements/effects/SVGMatte3Effect.js',
   'lottie-web/player/js/elements/svgElements/SVGEffects.js',
+
+  // Effects
+  'next/effects/CCProLevelsFilter.js',
+  'next/effects/CCMatte3Effect.js',
+  'next/effects/CCStrokeEffect.js',
+  'next/effects/CCFillFilter.js',
+  'next/effects/CCTintEffect.js',
+  'next/effects/CCDropShadowEffect.js',
+  'next/effects/CCTritoneFilter.js',
+
   'lottie-web/player/js/elements/canvasElements/CVContextData.js',
   'lottie-web/player/js/elements/canvasElements/CVBaseElement.js',
   'lottie-web/player/js/elements/canvasElements/CVImageElement.js',
@@ -110,13 +133,8 @@ var srcs = [
   'lottie-web/player/js/elements/htmlElements/HImageElement.js',
   'lottie-web/player/js/elements/htmlElements/HCameraElement.js',
   'lottie-web/player/js/elements/htmlElements/HEffects.js',
-  'lottie-web/player/js/animation/AnimationManager.js',
-  'lottie-web/player/js/animation/AnimationItem.js',
 
-  // Rewrite AnimationItem
-  // Should be placed after AnimationItem.js
-  'next/rewriteAnimationItem.js',
-
+  // ccElements
   'next/ccElements/CCEffects.js',
   'next/ccElements/CCTextElement.js',
   'next/ccElements/SVGCompElement.js',
@@ -127,22 +145,14 @@ var srcs = [
   'next/ccElements/CCCompElement.js',
   'next/ccElements/SVGTextElement.js',
   'next/ccElements/CCShapeElement.js',
-  'next/shapes/CCStrokeStyleData.js',
-  'next/shapes/CCTransformData.js',
-  'next/shapes/CCGradientFillStyleData.js',
-  'next/shapes/CCStyleData.js',
-  'next/shapes/CCGradientStrokeStyleData.js',
-  'next/shapes/CCShapeData.js',
-  'next/shapes/CCFillStyleData.js',
+
+  'lottie-web/player/js/animation/AnimationManager.js',
+  'lottie-web/player/js/animation/AnimationItem.js',
+
+  // Rewrite AnimationItem
+  // Should be placed after AnimationItem.js
+  'next/rewriteAnimationItem.js',
   'next/polyfill.js',
-  'next/CCRenderer.js',
-  'next/effects/CCProLevelsFilter.js',
-  'next/effects/CCMatte3Effect.js',
-  'next/effects/CCStrokeEffect.js',
-  'next/effects/CCFillFilter.js',
-  'next/effects/CCTintEffect.js',
-  'next/effects/CCDropShadowEffect.js',
-  'next/effects/CCTritoneFilter.js',
 
   'lottie-web/player/js/utils/expressions/Expressions.js',
   'lottie-web/player/js/utils/expressions/ExpressionManager.js',
