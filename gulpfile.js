@@ -135,11 +135,11 @@ var srcs = [
   'lottie-web/player/js/elements/htmlElements/HEffects.js',
 
   // ccElements
+  'next/ccElements/CCBaseElement.js',
   'next/ccElements/CCImageElement.js',
   'next/ccElements/CCEffects.js',
   'next/ccElements/CCTextElement.js',
   'next/ccElements/SVGCompElement.js',
-  'next/ccElements/CCBaseElement.js',
   'next/ccElements/SVGShapeElement.js',
   'next/ccElements/SVGBaseElement.js',
   'next/ccElements/SVGEffects.js',

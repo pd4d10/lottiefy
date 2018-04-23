@@ -3,11 +3,12 @@ function CCRenderer(animationItem, config){
     this.layers = null;
     this.renderedFrame = -1;
     this.svgElement = createNS('svg');
-    var maskElement = createNS('g');
-    this.svgElement.appendChild(maskElement);
-    this.layerElement = maskElement;
+    // var maskElement = createNS('g');
+    // this.svgElement.appendChild(maskElement);
+    // this.layerElement = maskElement;
+    this.layerElement = this.svgElement
     var defs = createNS( 'defs');
-    this.svgElement.appendChild(defs);
+    // this.svgElement.appendChild(defs);
     this.renderConfig = {
         preserveAspectRatio: (config && config.preserveAspectRatio) || 'xMidYMid meet',
         progressiveLoad: (config && config.progressiveLoad) || false,
@@ -60,22 +61,22 @@ CCRenderer.prototype.createSolid = function (data) {
 };
 
 CCRenderer.prototype.configAnimation = function(animData){
-    this.svgElement.setAttribute('xmlns','http://www.w3.org/2000/svg');
-    if(this.renderConfig.viewBoxSize) {
-        this.svgElement.setAttribute('viewBox',this.renderConfig.viewBoxSize);
-    } else {
-        this.svgElement.setAttribute('viewBox','0 0 '+animData.w+' '+animData.h);
-    }
+    // this.svgElement.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    // if(this.renderConfig.viewBoxSize) {
+    //     this.svgElement.setAttribute('viewBox',this.renderConfig.viewBoxSize);
+    // } else {
+    //     this.svgElement.setAttribute('viewBox','0 0 '+animData.w+' '+animData.h);
+    // }
 
-    if(!this.renderConfig.viewBoxOnly) {
-        this.svgElement.setAttribute('width',animData.w);
-        this.svgElement.setAttribute('height',animData.h);
-        this.svgElement.style.width = '100%';
-        this.svgElement.style.height = '100%';
-    }
-    if(this.renderConfig.className) {
-        this.svgElement.setAttribute('class', this.renderConfig.className);
-    }
+    // if(!this.renderConfig.viewBoxOnly) {
+    //     this.svgElement.setAttribute('width',animData.w);
+    //     this.svgElement.setAttribute('height',animData.h);
+    //     this.svgElement.style.width = '100%';
+    //     this.svgElement.style.height = '100%';
+    // }
+    // if(this.renderConfig.className) {
+    //     this.svgElement.setAttribute('class', this.renderConfig.className);
+    // }
     this.svgElement.setAttribute('preserveAspectRatio',this.renderConfig.preserveAspectRatio);
     //this.layerElement.style.transform = 'translate3d(0,0,0)';
     //this.layerElement.style.transformOrigin = this.layerElement.style.mozTransformOrigin = this.layerElement.style.webkitTransformOrigin = this.layerElement.style['-webkit-transform'] = "0px 0px 0px";
@@ -96,14 +97,14 @@ CCRenderer.prototype.configAnimation = function(animData){
     var rect = createNS('rect');
     rect.setAttribute('width',animData.w);
     rect.setAttribute('height',animData.h);
-    rect.setAttribute('x',0);
-    rect.setAttribute('y',0);
-    var maskId = 'animationMask_'+randomString(10);
-    maskElement.setAttribute('id', maskId);
-    maskElement.appendChild(rect);
-    this.layerElement.setAttribute("clip-path", "url(" + locationHref + "#"+maskId+")");
+    // rect.setAttribute('x',0);
+    // rect.setAttribute('y',0);
+    // var maskId = 'animationMask_'+randomString(10);
+    // maskElement.setAttribute('id', maskId);
+    // maskElement.appendChild(rect);
+    // this.layerElement.setAttribute("clip-path", "url(" + locationHref + "#"+maskId+")");
 
-    defs.appendChild(maskElement);
+    // defs.appendChild(maskElement);
     this.layers = animData.layers;
     this.globalData.fontManager.addChars(animData.chars);
     this.globalData.fontManager.addFonts(animData.fonts,defs);
