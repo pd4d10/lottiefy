@@ -5,7 +5,7 @@ CCBaseElement.prototype = {
     this.layerElement = createNS('g')
   },
   createContainerElements: function() {
-    this.matteElement = createNS('g')
+    // this.matteElement = createNS('g')
     this.transformedElement = this.layerElement
     this.maskedElement = this.layerElement
     this._sizeChanged = false
@@ -45,10 +45,10 @@ CCBaseElement.prototype = {
       this.transformedElement.setScale(mProp.s.v[0], mProp.s.v[1])
 
       if (mProp.r) {
-        // TODO:
-        this.transformedElement.setRotation(mProp.r.v)
+        // TODO: Shape element
+        this.transformedElement.setRotation(mProp.r.v * 180 / Math.PI)
       } else {
-        console.log(mProp)
+        // console.log(mProp)
       }
 
       this.transformedElement.ignoreAnchorPointForPosition(false)
