@@ -25,9 +25,6 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-wrap": "^0.13.0",
     "typescript": "^2.7.2"
   }
 }
