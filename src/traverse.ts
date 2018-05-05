@@ -1,5 +1,5 @@
 import { v4 } from 'uuid'
-import { Options, Layer, Shape, Effect, Color } from './types'
+import { Actions, Layer, Shape, Effect, Color } from './types'
 
 const genId = (nm?: string) => {
   return (nm || 'v') + '_' + v4().replace(/-/g, '_') // for lua variables
@@ -9,13 +9,12 @@ function convertColor(c: Color) {
   return c.map(n => n * 255)
 }
 
-export function traverse(data: any, containerId: string, useSpriteFrame: boolean, options: Options) {
-  const getTime = (time: number) => time / data.fr
-  // const getTime = (time: number) => time
-
-  let assets: {
-    [id: string]: any
+export function traverse(data: any, containerId: string, useSpriteFrame: boolean, actions: Actions) {
+  function getTime(time: number) {
+    return time / data.fr
   }
+
+  let assets: { [id: string]: any }
 
   function getAsset(id: string) {
     if (!assets) {
@@ -50,15 +49,15 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
         for (let item of data.it) {
           _traverseShape(item, parentId, parentWidth, parentHeight, id, d)
         }
-        options.createDrawNode(id, parentId, d.stroke.width)
+        actions.createDrawNode(id, parentId, d.stroke.width)
         d.shape.forEach((item: any[]) => {
-          options.drawCubicBezier(id, item[0], item[1], item[2], item[3], d.stroke.width, d.stroke.color)
+          actions.drawCubicBezier(id, item[0], item[1], item[2], item[3], d.stroke.width, d.stroke.color)
         })
         if (d.ellipse) {
           let [x, y] = d.transform.p.k
           const center = { x, y: -y }
           const [rx, ry] = d.ellipse.s.k
-          options.drawEllipse(id, center, rx, ry, 0, 100, true, d.stroke.width, d.stroke.color, d.fill.color)
+          actions.drawEllipse(id, center, rx, ry, 0, 100, true, d.stroke.width, d.stroke.color, d.fill.color)
         }
 
         break
@@ -147,7 +146,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
     parentWidth: number,
     parentHeight: number,
     st: number,
-    options: Options,
+    options: Actions,
   ) {
     const parseK = (k: any[]) => {
       return k.reduceRight(
@@ -182,7 +181,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
       } else if (k.length) {
         const opacity = k[0].s[0]
         options.setOpacity(id, opacity * 2.55)
-        options.fadeTo(id, parseK(k).arr, getTime(st))
+        options.setOpacityAnimation(id, parseK(k).arr, getTime(st))
       }
     }
 
@@ -205,7 +204,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
       } else if (k.length) {
         const [x, y] = k[0].s
         options.setPosition(id, x, parentHeight - y)
-        options.positionAnimate(id, parseK(k).arr, getTime(st), parentHeight)
+        options.setPositionAnimation(id, parseK(k).arr, getTime(st), parentHeight)
       }
     }
 
@@ -218,7 +217,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
         options.setRotation(id, k[0])
       } else {
         options.setRotation(id, k[0].s[0])
-        options.rotationAnimate(id, parseK(k).arr, getTime(st))
+        options.setRotationAnimatation(id, parseK(k).arr, getTime(st))
       }
     }
 
@@ -231,7 +230,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
       } else {
         const [x, y] = k[0].s
         options.setScale(id, x / 100, y / 100)
-        options.scaleAnimate(id, parseK(k).arr, getTime(st))
+        options.setScaleAnimatation(id, parseK(k).arr, getTime(st))
       }
     }
   }
@@ -239,7 +238,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
   function _traverseLayer(
     layer: any,
     parentId: string,
-    options: Options,
+    options: Actions,
     st: number,
     parentWidth: number,
     parentHeight: number,
@@ -251,9 +250,9 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
         const id = genId()
         // same width and height as parent
         // options.createLayer(id, parentWidth, parentHeight)
-        options.createLayer(id, 0, 0)
+        options.createPrecomp(id, 0, 0)
         _applyTransform(layer, id, parentId, parentWidth, parentHeight, parentWidth, parentHeight, st, options)
-        options.addChild(id, parentId)
+        options.appendChild(id, parentId)
         for (let shape of layer.shapes) {
           _traverseShape(shape, id, parentWidth, parentHeight)
         }
@@ -267,9 +266,9 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
         const asset = getAsset(id)
         if (!asset) break
         // TODO: sprite frame
-        options.createSprite(id, (useSpriteFrame ? '' : asset.u) + asset.p, asset.w, asset.h)
+        options.createImage(id, (useSpriteFrame ? '' : asset.u) + asset.p, asset.w, asset.h)
         options.setContentSize(id, asset.w, asset.h)
-        options.addChild(id, parentId)
+        options.appendChild(id, parentId)
         _applyTransform(layer, id, parentId, asset.w, asset.h, parentWidth, parentHeight, st, options)
 
         break
@@ -288,7 +287,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
           }
         }
         const [width, height] = getLayerWidthAndHeight(layer)
-        options.createLayer(id, width, height)
+        options.createPrecomp(id, width, height)
 
         _applyTransform(layer, id, parentId, width, height, parentWidth, parentHeight, st, options)
 
@@ -331,13 +330,13 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
           }
         }
 
-        options.addChild(id, parentId)
+        options.appendChild(id, parentId)
         break
       }
     }
   }
 
   for (let layer of data.layers) {
-    _traverseLayer(layer, containerId, options, 0, data.w, data.h)
+    _traverseLayer(layer, containerId, actions, 0, data.w, data.h)
   }
 }

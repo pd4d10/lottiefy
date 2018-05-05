@@ -1,21 +1,125 @@
-export interface Options {
-  createLayer(id: string, width?: number, height?: number): any
-  createSprite(id: string, name: string, width: number, height: number): any
-  setPosition(id: string, x: number, y: number): any
-  positionAnimate(id: string, data: any[], delay: number, parentHeight: number): any
+export interface Actions {
+  /**
+   * Create a precomp
+   * @param id
+   * @param width
+   * @param height
+   */
+  createPrecomp(id: string, width?: number, height?: number): any
+
+  /**
+   *
+   * @param id Element Id
+   * @param path Image path
+   * @param width Image width
+   * @param height Image height
+   */
+  createImage(id: string, path: string, width: number, height: number): any
+
+  /**
+   * Set position of an element
+   * @param id Element id
+   * @param x X axis position
+   * @param y Y axis position
+   */
+  setPosition(id: string, x: number, y?: number): any
+
+  /**
+   *
+   * @param id
+   * @param data
+   * @param delay
+   * @param parentHeight
+   */
+  setPositionAnimation(id: string, data: any[], delay: number, parentHeight: number): any
+
+  /**
+   * Set anchor point of an element
+   * @param id
+   * @param x
+   * @param y
+   */
   setAnchorPoint(id: string, x: number, y: number): any
+
+  /**
+   * Set rotation angle of an element
+   * @param id
+   * @param rotation
+   */
   setRotation(id: string, rotation: number): any
-  rotationAnimate(id: string, data: any[], delay: number): any
+
+  /**
+   *
+   * @param id
+   * @param data
+   * @param delay
+   */
+  setRotationAnimatation(id: string, data: any[], delay: number): any
+
+  /**
+   *
+   * @param id Element Id
+   * @param x X axis scale value
+   * @param y Y axis scale value
+   */
   setScale(id: string, x: number, y: number): any
-  scaleAnimate(id: string, data: any[], delay: number): any
+
+  /**
+   *
+   * @param id
+   * @param data
+   * @param delay
+   */
+  setScaleAnimatation(id: string, data: any[], delay: number): any
+
+  /**
+   *
+   * @param id
+   * @param parentId
+   * @param time
+   * @param x
+   * @param y
+   */
   moveTo(id: string, parentId: string, time: number, x: number, y: number): any
+
+  /**
+   * Set content size of an element
+   * @param id
+   * @param width
+   * @param height
+   */
   setContentSize(id: string, width: number, height: number): any
-  addChild(id: string, parentId: string, localZOrder?: number): any
-  getNode(id: string): any
+
+  /**
+   * Append an element as a child
+   * @param id
+   * @param parentId
+   * @param localZOrder
+   */
+  appendChild(id: string, parentId: string, localZOrder?: number): any
+
+  /**
+   * Get instance by Id
+   */
+  getNodeById(id: string): any
+
+  /**
+   *
+   * @param id Element id
+   * @param opacity 0-255
+   */
   setOpacity(id: string, opacity: number): void
-  fadeTo(id: string, data: any[], delay: number): void
+
+  /**
+   * Set (AKA fade)
+   * @param id
+   * @param data
+   * @param delay
+   */
+  setOpacityAnimation(id: string, data: any[], delay: number): void
 
   createDrawNode(id: string, parentId: string, width: number): any
+
   drawCubicBezier(
     id: string,
     origin: cc.Point,

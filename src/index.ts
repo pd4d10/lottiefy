@@ -14,18 +14,18 @@ export default function lottie(data: any, g: any) {
   ;(window as any).c = container
 
   traverse(data, containerId, false, {
-    createLayer(id, width, height) {
+    createPrecomp(id, width, height) {
       layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 30), width, height)
       // layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
     },
-    createSprite(id, name) {
+    createImage(id, name) {
       // layers[id] = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(name))
       layers[id] = new cc.Sprite(name)
     },
     setPosition(id, x, y) {
       layers[id].setPosition(x, y)
     },
-    positionAnimate(id, data, delay, parentHeight) {
+    setPositionAnimation(id, data, delay, parentHeight) {
       const a: any[] = []
       data.forEach((x: any) => {
         a.push(
@@ -43,7 +43,7 @@ export default function lottie(data: any, g: any) {
     setRotation(id, rotation) {
       layers[id].setRotation(rotation)
     },
-    rotationAnimate(id, data, delay) {
+    setRotationAnimatation(id, data, delay) {
       let a: any = []
       data.forEach((x: any) => {
         a.push(cc.rotateTo(x.startTime, x.s[0]), cc.rotateTo(x.t, x.e[0]))
@@ -54,7 +54,7 @@ export default function lottie(data: any, g: any) {
     setScale(id, x, y) {
       layers[id].setScale(x, y)
     },
-    scaleAnimate(id, data, delay) {
+    setScaleAnimatation(id, data, delay) {
       let a: any = []
       data.forEach((x: any) => {
         a.push(cc.scaleTo(x.startTime, x.s[0] / 100, x.s[1] / 100), cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100))
@@ -73,19 +73,19 @@ export default function lottie(data: any, g: any) {
       // console.log(layers[parentId])
       layers[id].runAction(cc.moveTo(time, x, layers[parentId].height - y))
     },
-    addChild(id, parentId, localZOrder) {
+    appendChild(id, parentId, localZOrder) {
       // console.log(arguments)
       // layers[id].ignoreAnchorPointForPosition(false)
       layers[parentId].addChild(layers[id], localZOrder)
     },
-    getNode(id) {
+    getNodeById(id) {
       return layers[id]
     },
     setOpacity(id, opacity) {
       // layers[id].setCascadeOpacityEnabled(true)
       // layers[id].setOpacity(opacity)
     },
-    fadeTo(id, data, delay) {
+    setOpacityAnimation(id, data, delay) {
       let a: any = []
       data.forEach((x: any) => {
         a.push(cc.fadeTo(x.startTime, x.s[0] * 2.55), cc.fadeTo(x.t, x.e[0] * 2.55))
@@ -97,7 +97,7 @@ export default function lottie(data: any, g: any) {
     createDrawNode(id, parentId) {
       // console.log(id)
       layers[id] = new cc.DrawNode()
-      this.addChild(id, parentId)
+      this.appendChild(id, parentId)
     },
     drawCubicBezier(id, origin, c1, c2, dest, width, color) {
       let node = layers[id] as cc.DrawNode

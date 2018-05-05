@@ -20,17 +20,17 @@ export function lua(data: any, containerId: string) {
   }
 
   traverse(data, containerId, true, {
-    createLayer(id, width, height) {
+    createPrecomp(id, width, height) {
       append(`t['${id}'] = cc.Layer:create()`)
       append(`t['${id}']:setContentSize(${width}, ${height})`)
     },
-    createSprite(id, name) {
+    createImage(id, name) {
       append(`t['${id}'] = display.newSprite("#${name}")`)
     },
     setPosition(id, x, y) {
       append(`t['${id}']:setPosition(cc.p(${x}, ${y}))`)
     },
-    positionAnimate(id, data, delay, parentHeight) {
+    setPositionAnimation(id, data, delay, parentHeight) {
       const a: any[] = []
       data.forEach((x: any) => {
         a.push(
@@ -48,7 +48,7 @@ export function lua(data: any, containerId: string) {
     setRotation(id, rotation) {
       append(`t['${id}']:setRotation(${rotation})`)
     },
-    rotationAnimate(id, data, delay) {
+    setRotationAnimatation(id, data, delay) {
       let a: any = []
       data.forEach((x: any) => {
         a.push(`cc.RotateTo:create(${x.startTime}, ${x.s[0]})`, `cc.RotateTo:create(${x.t}, ${x.e[0]})`)
@@ -60,7 +60,7 @@ export function lua(data: any, containerId: string) {
       append(`t['${id}']:setScaleX(${x})`)
       append(`t['${id}']:setScaleY(${y})`)
     },
-    scaleAnimate(id, data, delay) {
+    setScaleAnimatation(id, data, delay) {
       let a: any = []
       data.forEach((x: any) => {
         a.push(
@@ -79,16 +79,16 @@ export function lua(data: any, containerId: string) {
       t['${id}']:setAnchorPoint(cc.p(${x}, ${y}))`)
     },
     moveTo(id, parentId, time, x, y) {},
-    addChild(id, parentId, localZOrder) {
+    appendChild(id, parentId, localZOrder) {
       const c = parentId === 'g' ? 'g' : `t['${parentId}']`
       append(`${c}:addChild(t['${id}'])`)
     },
-    getNode(id) {},
+    getNodeById(id) {},
 
     setOpacity(id, opacity) {
       append(`t['${id}']:setOpacity(${opacity})`)
     },
-    fadeTo(id, data, delay) {
+    setOpacityAnimation(id, data, delay) {
       let a: any = []
       data.forEach((x: any) => {
         a.push(`cc.FadeTo:create(${x.startTime}, ${x.s[0] * 2.55})`, `cc.FadeTo:create(${x.t}, ${x.e[0] * 2.55})`)
