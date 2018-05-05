@@ -9,7 +9,7 @@ function convertColor(c: Color) {
   return c.map(n => n * 255)
 }
 
-export function traverse(data: any, containerId: string, useSpriteFrame: boolean, actions: Actions) {
+export function traverse(data: any, containerId: string, actions: Actions) {
   function getTime(time: number) {
     return time / data.fr
   }
@@ -266,7 +266,7 @@ export function traverse(data: any, containerId: string, useSpriteFrame: boolean
         const asset = getAsset(id)
         if (!asset) break
         // TODO: sprite frame
-        options.createImage(id, (useSpriteFrame ? '' : asset.u) + asset.p, asset.w, asset.h)
+        options.createImage(id, asset.u, asset.p, asset.w, asset.h)
         options.setContentSize(id, asset.w, asset.h)
         options.appendChild(id, parentId)
         _applyTransform(layer, id, parentId, asset.w, asset.h, parentWidth, parentHeight, st, options)

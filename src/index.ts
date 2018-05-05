@@ -13,14 +13,16 @@ export default function lottie(data: any, g: any) {
   g.addChild(container)
   ;(window as any).c = container
 
-  traverse(data, containerId, false, {
+  var useSpriteFrame = false
+
+  traverse(data, containerId, {
     createPrecomp(id, width, height) {
       layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 30), width, height)
       // layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
     },
-    createImage(id, name) {
+    createImage(id, path, name) {
       // layers[id] = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(name))
-      layers[id] = new cc.Sprite(name)
+      layers[id] = new cc.Sprite(useSpriteFrame ? name : path + name)
     },
     setPosition(id, x, y) {
       layers[id].setPosition(x, y)

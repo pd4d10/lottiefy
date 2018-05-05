@@ -19,12 +19,12 @@ export function lua(data: any, containerId: string) {
     return `cc.c4f(${r}, ${g}, ${b}, ${a})`
   }
 
-  traverse(data, containerId, true, {
+  traverse(data, containerId, {
     createPrecomp(id, width, height) {
       append(`t['${id}'] = cc.Layer:create()`)
       append(`t['${id}']:setContentSize(${width}, ${height})`)
     },
-    createImage(id, name) {
+    createImage(id, path, name) {
       append(`t['${id}'] = display.newSprite("#${name}")`)
     },
     setPosition(id, x, y) {

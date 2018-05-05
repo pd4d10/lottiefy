@@ -11,10 +11,11 @@ export interface Actions {
    *
    * @param id Element Id
    * @param path Image path
+   * @param name Image name
    * @param width Image width
    * @param height Image height
    */
-  createImage(id: string, path: string, width: number, height: number): any
+  createImage(id: string, path: string, name: string, width: number, height: number): any
 
   /**
    * Set position of an element
