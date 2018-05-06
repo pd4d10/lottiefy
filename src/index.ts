@@ -5,9 +5,10 @@ import LottieRenderer from './traverse'
 
 export default function lottie(data: any, g: any) {
   const layers: { [id: string]: cc.Layer | cc.Sprite | cc.DrawNode } = {}
+  const actions: { id: string; action: cc.Sequence }[] = []
 
   const container = new cc.LayerColor(cc.color(0, 0, 50, 100), data.w, data.h)
-  // container.setScale(0.5)
+  // container.setScale(0.3)
   const containerId = 'xxxxx'
   layers[containerId] = container
   g.addChild(container)
@@ -15,7 +16,7 @@ export default function lottie(data: any, g: any) {
 
   var useSpriteFrame = false
 
-  new LottieRenderer(data, containerId, {
+  const renderer = new LottieRenderer(data, containerId, {
     createPrecomp(id, width, height) {
       layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 30), width, height)
       // layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
@@ -27,20 +28,18 @@ export default function lottie(data: any, g: any) {
     setPosition(id, x, y) {
       layers[id].setPosition(x, y)
     },
-    setPositionAnimation(id, data, delay, parentHeight) {
+    setPositionAnimation(id, data, delay) {
+      // console.log(data, delay)
       const a: any[] = []
-      data.forEach((x: any) => {
+      data.forEach(item => {
         a.push(
-          cc.moveTo(x.startTime, cc.p(x.s[0], parentHeight - x.s[1])),
-          cc.bezierTo(x.t, [
-            cc.p(x.s[0] + x.to[0], parentHeight - (x.s[1] + x.to[1])),
-            cc.p(x.ti[0] + x.e[0], parentHeight - (x.ti[1] + x.e[1])),
-            cc.p(x.e[0], parentHeight - x.e[1]),
-          ]),
+          cc.delayTime(item.delay),
+          cc.moveTo(0, item.points[0]),
+          cc.bezierTo(item.duration, item.points.slice(1)),
         )
       })
       a.unshift(cc.delayTime(delay))
-      layers[id].runAction(cc.sequence(a))
+      actions.push({ id, action: cc.sequence(a) })
     },
     setRotation(id, rotation) {
       layers[id].setRotation(rotation)
@@ -51,7 +50,7 @@ export default function lottie(data: any, g: any) {
         a.push(cc.rotateTo(x.startTime, x.s[0]), cc.rotateTo(x.t, x.e[0]))
       })
       a.unshift(cc.delayTime(delay))
-      layers[id].runAction(cc.sequence(a))
+      actions.push({ id, action: cc.sequence(a) })
     },
     setScale(id, x, y) {
       layers[id].setScale(x, y)
@@ -65,12 +64,13 @@ export default function lottie(data: any, g: any) {
         )
       })
       a.unshift(cc.delayTime(delay))
-      layers[id].runAction(cc.sequence(a))
+      actions.push({ id, action: cc.sequence(a) })
     },
     setContentSize(id, width, height) {
       layers[id].setContentSize(width, height)
     },
     setAnchor(id, x, y) {
+      // console.log(id, x, y)
       layers[id].ignoreAnchorPointForPosition(false)
       layers[id].setAnchorPoint(x, y)
     },
@@ -95,7 +95,7 @@ export default function lottie(data: any, g: any) {
         )
       })
       a.unshift(cc.delayTime(delay))
-      layers[id].runAction(cc.sequence(a))
+      actions.push({ id, action: cc.sequence(a) })
     },
 
     createShape(id, parentId) {
@@ -253,5 +253,13 @@ export default function lottie(data: any, g: any) {
       const x = new C(10)
       x.startWithTarget(layers[id])
     },
+  })
+
+  renderer.reverseY = true
+  renderer.generateAnimations()
+
+  // console.log(actions)
+  actions.forEach(({ id, action }) => {
+    layers[id].runAction(action)
   })
 }

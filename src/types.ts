@@ -45,9 +45,8 @@ export interface Actions {
    */
   setPositionAnimation(
     id: string,
-    data: any[],
+    data: PositionAnimationData[],
     delay: number,
-    parentHeight: number,
   ): any
 
   /**
@@ -177,4 +176,14 @@ export type Keyframe = {
   e: any
   to: any
   ti: any
+}
+
+export type Point = { x: number; y: number }
+
+export type BezierPoints = [Point, Point, Point, Point]
+
+export type PositionAnimationData = {
+  delay: number
+  duration: number
+  points: BezierPoints
 }
