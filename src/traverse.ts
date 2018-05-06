@@ -1,4 +1,5 @@
 import { v4 } from 'uuid'
+
 import {
   Actions,
   Layer,
@@ -11,10 +12,6 @@ import {
   PositionAnimationData,
 } from './types'
 
-const genId = (nm?: string) => {
-  return (nm || 'v') + '_' + v4().replace(/-/g, '_') // for lua variables
-}
-
 function convertColor(c: Color) {
   return c.map(n => n * 255)
 }
@@ -24,29 +21,17 @@ export default class LottieRenderer {
   containerId: string // Container
   actions: Actions
   assets: { [id: string]: any }
+  generateId = v4
 
   /**
    * Some engine like Cocos2dx's Y coordinate
    */
   reverseY = false
 
-  _getCorrectY(y: number, parentHeight: number) {
-    return this.reverseY ? parentHeight - y : y
-  }
-
-  /**
-   * Get second of time
-   * @param frame
-   */
-  getTime(frame: number) {
-    return frame / this.data.fr
-  }
-
   constructor(data: any, containerId: string, actions: Actions) {
     this.data = data
     this.containerId = containerId
     this.actions = actions
-
     // Convert assets to a map for easily accessing
     this.assets = {}
     for (let asset of data.assets) {
@@ -56,13 +41,25 @@ export default class LottieRenderer {
     }
   }
 
+  private _getCorrectY(y: number, parentHeight: number) {
+    return this.reverseY ? parentHeight - y : y
+  }
+
+  /**
+   * Get second of time
+   * @param frame
+   */
+  private _getTime(frame: number) {
+    return frame / this.data.fr
+  }
+
   generateAnimations() {
     for (let layer of this.data.layers) {
       this._traverseLayer(layer, this.containerId, 0, this.data.w, this.data.h)
     }
   }
 
-  _applyAnchor(layer: any, id: string, width: number, height: number) {}
+  private _applyAnchor(layer: any, id: string, width: number, height: number) {}
 
   // _traverseEffect(data: any, parentId: string, node: cc.DrawNode) {
   //   switch (data.ty) {
@@ -78,7 +75,7 @@ export default class LottieRenderer {
   //   }
   // }
 
-  _traverseShape(
+  private _traverseShape(
     data: any,
     parentId: string,
     parentWidth: number,
@@ -88,7 +85,7 @@ export default class LottieRenderer {
   ) {
     switch (data.ty) {
       case Shape.group: {
-        const id = genId()
+        const id = this.generateId()
         const d: any = {
           id,
           stroke: null,
@@ -199,7 +196,7 @@ export default class LottieRenderer {
     }
   }
 
-  parseBezier(result: any[], offset: number, parentHeight: number) {
+  private _parseBezier(result: any[], offset: number, parentHeight: number) {
     const a: PositionAnimationData[] = []
     a = result.map(item => {
       // console.log(item)
@@ -226,7 +223,11 @@ export default class LottieRenderer {
     return a
   }
 
-  parseKeyframe(keyframes: Keyframe[], offset: number, parentHeight: number) {
+  private _parseKeyframe(
+    keyframes: Keyframe[],
+    offset: number,
+    parentHeight: number,
+  ) {
     let nextTime = null
     let result = []
 
@@ -238,8 +239,8 @@ export default class LottieRenderer {
           e,
           to,
           ti,
-          t: this.getTime(nextTime - t),
-          startTime: i === 0 ? this.getTime(t) : 0,
+          t: this._getTime(nextTime - t),
+          startTime: i === 0 ? this._getTime(t) : 0,
         })
       }
       nextTime = t
@@ -248,7 +249,7 @@ export default class LottieRenderer {
     return result
   }
 
-  _applyTransform(
+  private _applyTransform(
     layer: any,
     id: string,
     parentId: string,
@@ -269,8 +270,8 @@ export default class LottieRenderer {
         this.actions.setOpacity(id, opacity * 2.55)
         this.actions.setOpacityAnimation(
           id,
-          this.parseKeyframe(k, st, parentHeight),
-          this.getTime(st),
+          this._parseKeyframe(k, st, parentHeight),
+          this._getTime(st),
         )
       }
     }
@@ -300,12 +301,12 @@ export default class LottieRenderer {
         this.actions.setPosition(id, x, this._getCorrectY(y, parentHeight))
         this.actions.setPositionAnimation(
           id,
-          this.parseBezier(
-            this.parseKeyframe(k, st, parentHeight),
+          this._parseBezier(
+            this._parseKeyframe(k, st, parentHeight),
             st,
             parentHeight,
           ),
-          this.getTime(st),
+          this._getTime(st),
         )
       }
     }
@@ -321,8 +322,8 @@ export default class LottieRenderer {
         this.actions.setRotation(id, k[0].s[0])
         this.actions.setRotationAnimatation(
           id,
-          this.parseKeyframe(k, st, parentHeight),
-          this.getTime(st),
+          this._parseKeyframe(k, st, parentHeight),
+          this._getTime(st),
         )
       }
     }
@@ -338,14 +339,14 @@ export default class LottieRenderer {
         this.actions.setScale(id, x / 100, y / 100)
         this.actions.setScaleAnimatation(
           id,
-          this.parseKeyframe(k, st, parentHeight),
-          this.getTime(st),
+          this._parseKeyframe(k, st, parentHeight),
+          this._getTime(st),
         )
       }
     }
   }
 
-  _traverseLayer(
+  private _traverseLayer(
     layer: any,
     parentId: string,
     st: number,
@@ -356,7 +357,7 @@ export default class LottieRenderer {
 
     switch (layer.ty) {
       case Layer.shape: {
-        const id = genId()
+        const id = this.generateId()
         // same width and height as parent
         // options.createLayer(id, parentWidth, parentHeight)
         this.actions.createPrecomp(id, 0, 0)
@@ -402,7 +403,7 @@ export default class LottieRenderer {
       }
       case Layer.null:
       case Layer.precomp: {
-        const id = genId(layer.refId)
+        const id = this.generateId(layer.refId)
         layer.xid = id
 
         const getLayerWidthAndHeight = (l: any) => {

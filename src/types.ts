@@ -1,10 +1,5 @@
 export interface Actions {
   /**
-   * Generate a random element id. If not specified, uuid will be used.
-   */
-  generateId?(): string
-
-  /**
    * Create a precomp
    * @param id Element id
    * @param width Precomp width

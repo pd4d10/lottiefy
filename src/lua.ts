@@ -1,6 +1,7 @@
 // lua code generator
 // TODO: use ast
 
+import { v4 } from 'uuid'
 import LottieRenderer from './traverse'
 import { Color } from './types'
 
@@ -19,7 +20,7 @@ export function lua(data: any, containerId: string) {
     return `cc.c4f(${r}, ${g}, ${b}, ${a})`
   }
 
-  LottieRenderer(data, containerId, {
+  const renderer = new LottieRenderer(data, containerId, {
     createPrecomp(id, width, height) {
       append(`t['${id}'] = cc.Layer:create()`)
       append(`t['${id}']:setContentSize(${width}, ${height})`)
@@ -134,6 +135,11 @@ export function lua(data: any, containerId: string) {
     },
     curveAnimate() {},
   })
+
+  renderer.reverseX = true
+  renderer.generateId = (nm?: string) => {
+    return (nm || 'v') + '_' + v4().replace(/-/g, '_') // for lua variables
+  }
 
   return code
 }
