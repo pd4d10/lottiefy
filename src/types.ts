@@ -1,21 +1,32 @@
 export interface Actions {
   /**
-   * Create a precomp
-   * @param id
-   * @param width
-   * @param height
+   * Generate a random element id. If not specified, uuid will be used.
    */
-  createPrecomp(id: string, width?: number, height?: number): any
+  generateId?(): string
 
   /**
-   *
-   * @param id Element Id
+   * Create a precomp
+   * @param id Element id
+   * @param width Precomp width
+   * @param height Precomp height
+   */
+  createPrecomp(id: string, width: number, height: number): void
+
+  /**
+   * Create an image
+   * @param id Element id
    * @param path Image path
    * @param name Image name
    * @param width Image width
    * @param height Image height
    */
-  createImage(id: string, path: string, name: string, width: number, height: number): any
+  createImage(
+    id: string,
+    path: string,
+    name: string,
+    width: number,
+    height: number,
+  ): void
 
   /**
    * Set position of an element
@@ -23,16 +34,21 @@ export interface Actions {
    * @param x X axis position
    * @param y Y axis position
    */
-  setPosition(id: string, x: number, y?: number): any
+  setPosition(id: string, x: number, y: number): void
 
   /**
-   *
+   * Set an animation of position
    * @param id
    * @param data
    * @param delay
    * @param parentHeight
    */
-  setPositionAnimation(id: string, data: any[], delay: number, parentHeight: number): any
+  setPositionAnimation(
+    id: string,
+    data: any[],
+    delay: number,
+    parentHeight: number,
+  ): any
 
   /**
    * Set anchor point of an element
@@ -40,7 +56,7 @@ export interface Actions {
    * @param x
    * @param y
    */
-  setAnchorPoint(id: string, x: number, y: number): any
+  setAnchor(id: string, x: number, y: number): any
 
   /**
    * Set rotation angle of an element
@@ -72,16 +88,6 @@ export interface Actions {
    * @param delay
    */
   setScaleAnimatation(id: string, data: any[], delay: number): any
-
-  /**
-   *
-   * @param id
-   * @param parentId
-   * @param time
-   * @param x
-   * @param y
-   */
-  moveTo(id: string, parentId: string, time: number, x: number, y: number): any
 
   /**
    * Set content size of an element
@@ -119,7 +125,7 @@ export interface Actions {
    */
   setOpacityAnimation(id: string, data: any[], delay: number): void
 
-  createDrawNode(id: string, parentId: string, width: number): any
+  createShape(id: string, parentId: string, width: number): any
 
   drawCubicBezier(
     id: string,
@@ -163,4 +169,12 @@ export enum Effect {
   checkbox = 4,
   group = 5,
   dropDown = 7,
+}
+
+export type Keyframe = {
+  t: number
+  s: any
+  e: any
+  to: any
+  ti: any
 }

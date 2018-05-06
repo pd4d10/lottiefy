@@ -1,5 +1,5 @@
 import { v4 } from 'uuid'
-import { Actions, Layer, Shape, Effect, Color } from './types'
+import { Actions, Layer, Shape, Effect, Color, Keyframe } from './types'
 
 const genId = (nm?: string) => {
   return (nm || 'v') + '_' + v4().replace(/-/g, '_') // for lua variables
@@ -9,26 +9,54 @@ function convertColor(c: Color) {
   return c.map(n => n * 255)
 }
 
-export function traverse(data: any, containerId: string, actions: Actions) {
-  function getTime(time: number) {
-    return time / data.fr
+export default class LottieRenderer {
+  data: any // JSON data exported by Bodymovin
+  containerId: string // Container
+  assets: { [id: string]: any }
+  actions: Actions
+
+  /**
+   * Get second of time
+   * @param frame
+   */
+  getTime(frame: number) {
+    return frame / this.data.fr
   }
 
-  let assets: { [id: string]: any }
+  constructor(data: any, containerId: string, actions: Actions) {
+    this.data = data
+    this.containerId = containerId
+    this.actions = actions
 
-  function getAsset(id: string) {
-    if (!assets) {
-      assets = {}
-      for (let asset of data.assets) {
-        if (asset.id) {
-          assets[asset.id] = asset
-        }
+    this.assets = {}
+    for (let asset of data.assets) {
+      if (asset.id) {
+        this.assets[asset.id] = asset
       }
     }
-    return assets[id]
+
+    // function _traverseEffect(data: any, parentId: string, node: cc.DrawNode) {
+    //   switch (data.ty) {
+    //     case Effect.group: {
+    //       if (data.mn === 'ADBE Gaussian Blur 2') {
+    //       }
+    //       for (let item of data.ef) {
+    //         _traverseEffect(item, parentId, node)
+    //       }
+    //     }
+    //     case Effect.dropDown: {
+    //     }
+    //   }
+    // }
+
+    for (let layer of data.layers) {
+      this._traverseLayer(layer, containerId, actions, 0, data.w, data.h)
+    }
   }
 
-  function _traverseShape(
+  _applyAnchor(layer: any, id: string, width: number, height: number) {}
+
+  _traverseShape(
     data: any,
     parentId: string,
     parentWidth: number,
@@ -47,17 +75,36 @@ export function traverse(data: any, containerId: string, actions: Actions) {
           transform: null,
         }
         for (let item of data.it) {
-          _traverseShape(item, parentId, parentWidth, parentHeight, id, d)
+          this._traverseShape(item, parentId, parentWidth, parentHeight, id, d)
         }
-        actions.createDrawNode(id, parentId, d.stroke.width)
+        this.actions.createShape(id, parentId, d.stroke.width)
         d.shape.forEach((item: any[]) => {
-          actions.drawCubicBezier(id, item[0], item[1], item[2], item[3], d.stroke.width, d.stroke.color)
+          this.actions.drawCubicBezier(
+            id,
+            item[0],
+            item[1],
+            item[2],
+            item[3],
+            d.stroke.width,
+            d.stroke.color,
+          )
         })
         if (d.ellipse) {
           let [x, y] = d.transform.p.k
           const center = { x, y: -y }
           const [rx, ry] = d.ellipse.s.k
-          actions.drawEllipse(id, center, rx, ry, 0, 100, true, d.stroke.width, d.stroke.color, d.fill.color)
+          this.actions.drawEllipse(
+            id,
+            center,
+            rx,
+            ry,
+            0,
+            100,
+            true,
+            d.stroke.width,
+            d.stroke.color,
+            d.fill.color,
+          )
         }
 
         break
@@ -121,23 +168,30 @@ export function traverse(data: any, containerId: string, actions: Actions) {
     }
   }
 
-  // function _traverseEffect(data: any, parentId: string, node: cc.DrawNode) {
-  //   switch (data.ty) {
-  //     case Effect.group: {
-  //       if (data.mn === 'ADBE Gaussian Blur 2') {
-  //       }
-  //       for (let item of data.ef) {
-  //         _traverseEffect(item, parentId, node)
-  //       }
-  //     }
-  //     case Effect.dropDown: {
-  //     }
-  //   }
-  // }
+  parseKeyframe(keyframes: Keyframe[]) {
+    let nextTime = null
+    let result = []
 
-  function _applyAnchor(layer: any, id: string, width: number, height: number) {}
+    for (let i = keyframes.length - 1; i >= 0; i--) {
+      const { s, e, to, ti, t } = keyframes[i]
+      if (s) {
+        result.unshift({
+          s,
+          e,
+          to,
+          ti,
+          t: this.getTime(nextTime - t),
+          startTime: i === 0 ? this.getTime(t) : 0,
+        })
+      }
+      nextTime = t
+    }
+    // console.log(result)
 
-  function _applyTransform(
+    return result
+  }
+
+  _applyTransform(
     layer: any,
     id: string,
     parentId: string,
@@ -148,30 +202,6 @@ export function traverse(data: any, containerId: string, actions: Actions) {
     st: number,
     options: Actions,
   ) {
-    const parseK = (k: any[]) => {
-      return k.reduceRight(
-        (result, item, i) => {
-          const { s, e, to, ti, t } = item
-          if (s) {
-            result.arr.unshift({
-              s,
-              e,
-              to,
-              ti,
-              t: getTime(result.nextTime - t),
-              startTime: i === 0 ? getTime(t) : 0,
-            })
-          }
-          result.nextTime = t
-          return result
-        },
-        {
-          nextTime: null,
-          arr: [],
-        },
-      )
-    }
-
     // Opacity
     if (layer.ks.o) {
       console.log(layer.nm)
@@ -181,7 +211,7 @@ export function traverse(data: any, containerId: string, actions: Actions) {
       } else if (k.length) {
         const opacity = k[0].s[0]
         options.setOpacity(id, opacity * 2.55)
-        options.setOpacityAnimation(id, parseK(k).arr, getTime(st))
+        options.setOpacityAnimation(id, this.parseKeyframe(k), this.getTime(st))
       }
     }
 
@@ -189,7 +219,7 @@ export function traverse(data: any, containerId: string, actions: Actions) {
     if (layer.ks.a && layer.ks.a.k) {
       const [x, y] = layer.ks.a.k
       if (typeof x === 'number' && typeof y === 'number') {
-        options.setAnchorPoint(id, x / width, 1 - y / height)
+        options.setAnchor(id, x / width, 1 - y / height)
       } else {
         console.log('Anchor error: ', id, layer.ks.a)
       }
@@ -204,7 +234,12 @@ export function traverse(data: any, containerId: string, actions: Actions) {
       } else if (k.length) {
         const [x, y] = k[0].s
         options.setPosition(id, x, parentHeight - y)
-        options.setPositionAnimation(id, parseK(k).arr, getTime(st), parentHeight)
+        options.setPositionAnimation(
+          id,
+          this.parseKeyframe(k),
+          this.getTime(st),
+          parentHeight,
+        )
       }
     }
 
@@ -217,7 +252,11 @@ export function traverse(data: any, containerId: string, actions: Actions) {
         options.setRotation(id, k[0])
       } else {
         options.setRotation(id, k[0].s[0])
-        options.setRotationAnimatation(id, parseK(k).arr, getTime(st))
+        options.setRotationAnimatation(
+          id,
+          this.parseKeyframe(k),
+          this.getTime(st),
+        )
       }
     }
 
@@ -230,12 +269,12 @@ export function traverse(data: any, containerId: string, actions: Actions) {
       } else {
         const [x, y] = k[0].s
         options.setScale(id, x / 100, y / 100)
-        options.setScaleAnimatation(id, parseK(k).arr, getTime(st))
+        options.setScaleAnimatation(id, this.parseKeyframe(k), this.getTime(st))
       }
     }
   }
 
-  function _traverseLayer(
+  _traverseLayer(
     layer: any,
     parentId: string,
     options: Actions,
@@ -251,10 +290,20 @@ export function traverse(data: any, containerId: string, actions: Actions) {
         // same width and height as parent
         // options.createLayer(id, parentWidth, parentHeight)
         options.createPrecomp(id, 0, 0)
-        _applyTransform(layer, id, parentId, parentWidth, parentHeight, parentWidth, parentHeight, st, options)
+        this._applyTransform(
+          layer,
+          id,
+          parentId,
+          parentWidth,
+          parentHeight,
+          parentWidth,
+          parentHeight,
+          st,
+          options,
+        )
         options.appendChild(id, parentId)
         for (let shape of layer.shapes) {
-          _traverseShape(shape, id, parentWidth, parentHeight)
+          this._traverseShape(shape, id, parentWidth, parentHeight)
         }
         break
       }
@@ -263,13 +312,23 @@ export function traverse(data: any, containerId: string, actions: Actions) {
       }
       case Layer.image: {
         const id = layer.refId
-        const asset = getAsset(id)
+        const asset = this.assets[id]
         if (!asset) break
         // TODO: sprite frame
         options.createImage(id, asset.u, asset.p, asset.w, asset.h)
         options.setContentSize(id, asset.w, asset.h)
         options.appendChild(id, parentId)
-        _applyTransform(layer, id, parentId, asset.w, asset.h, parentWidth, parentHeight, st, options)
+        this._applyTransform(
+          layer,
+          id,
+          parentId,
+          asset.w,
+          asset.h,
+          parentWidth,
+          parentHeight,
+          st,
+          options,
+        )
 
         break
       }
@@ -289,7 +348,17 @@ export function traverse(data: any, containerId: string, actions: Actions) {
         const [width, height] = getLayerWidthAndHeight(layer)
         options.createPrecomp(id, width, height)
 
-        _applyTransform(layer, id, parentId, width, height, parentWidth, parentHeight, st, options)
+        this._applyTransform(
+          layer,
+          id,
+          parentId,
+          width,
+          height,
+          parentWidth,
+          parentHeight,
+          st,
+          options,
+        )
 
         // effects
         if (layer.ef) {
@@ -298,7 +367,7 @@ export function traverse(data: any, containerId: string, actions: Actions) {
           }
         }
 
-        const asset = getAsset(layer.refId)
+        const asset = this.assets[layer.refId]
         if (asset && asset.layers) {
           // FIXME: parent before child
           const sortedLayers = []
@@ -326,7 +395,14 @@ export function traverse(data: any, containerId: string, actions: Actions) {
               parentHeight = height
             }
 
-            _traverseLayer(l, correctId, options, st + (layer.st || 0), parentWidth, parentHeight)
+            this._traverseLayer(
+              l,
+              correctId,
+              options,
+              st + (layer.st || 0),
+              parentWidth,
+              parentHeight,
+            )
           }
         }
 
@@ -334,9 +410,5 @@ export function traverse(data: any, containerId: string, actions: Actions) {
         break
       }
     }
-  }
-
-  for (let layer of data.layers) {
-    _traverseLayer(layer, containerId, actions, 0, data.w, data.h)
   }
 }

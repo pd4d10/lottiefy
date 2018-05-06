@@ -1,7 +1,7 @@
 /// <reference path="../typings/cocos2d/cocos2d-lib.d.ts" />
 import { Layers, Assets } from '../typings/animation'
 import { Color } from './types'
-import { traverse } from './traverse'
+import LottieRenderer from './traverse'
 
 export default function lottie(data: any, g: any) {
   const layers: { [id: string]: cc.Layer | cc.Sprite | cc.DrawNode } = {}
@@ -15,7 +15,7 @@ export default function lottie(data: any, g: any) {
 
   var useSpriteFrame = false
 
-  traverse(data, containerId, {
+  new LottieRenderer(data, containerId, {
     createPrecomp(id, width, height) {
       layers[id] = new cc.LayerColor(cc.color(255, 255, 0, 30), width, height)
       // layers[id] = new cc.LayerColor(cc.color(0, 0, 0, 0), width, height)
@@ -59,7 +59,10 @@ export default function lottie(data: any, g: any) {
     setScaleAnimatation(id, data, delay) {
       let a: any = []
       data.forEach((x: any) => {
-        a.push(cc.scaleTo(x.startTime, x.s[0] / 100, x.s[1] / 100), cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100))
+        a.push(
+          cc.scaleTo(x.startTime, x.s[0] / 100, x.s[1] / 100),
+          cc.scaleTo(x.t, x.e[0] / 100, x.e[1] / 100),
+        )
       })
       a.unshift(cc.delayTime(delay))
       layers[id].runAction(cc.sequence(a))
@@ -67,13 +70,9 @@ export default function lottie(data: any, g: any) {
     setContentSize(id, width, height) {
       layers[id].setContentSize(width, height)
     },
-    setAnchorPoint(id, x, y) {
+    setAnchor(id, x, y) {
       layers[id].ignoreAnchorPointForPosition(false)
       layers[id].setAnchorPoint(x, y)
-    },
-    moveTo(id, parentId, time, x, y) {
-      // console.log(layers[parentId])
-      layers[id].runAction(cc.moveTo(time, x, layers[parentId].height - y))
     },
     appendChild(id, parentId, localZOrder) {
       // console.log(arguments)
@@ -90,20 +89,31 @@ export default function lottie(data: any, g: any) {
     setOpacityAnimation(id, data, delay) {
       let a: any = []
       data.forEach((x: any) => {
-        a.push(cc.fadeTo(x.startTime, x.s[0] * 2.55), cc.fadeTo(x.t, x.e[0] * 2.55))
+        a.push(
+          cc.fadeTo(x.startTime, x.s[0] * 2.55),
+          cc.fadeTo(x.t, x.e[0] * 2.55),
+        )
       })
       a.unshift(cc.delayTime(delay))
       layers[id].runAction(cc.sequence(a))
     },
 
-    createDrawNode(id, parentId) {
+    createShape(id, parentId) {
       // console.log(id)
       layers[id] = new cc.DrawNode()
       this.appendChild(id, parentId)
     },
     drawCubicBezier(id, origin, c1, c2, dest, width, color) {
       let node = layers[id] as cc.DrawNode
-      node.drawCubicBezier(origin, c1, c2, dest, 100, width, cc.color.apply(null, color))
+      node.drawCubicBezier(
+        origin,
+        c1,
+        c2,
+        dest,
+        100,
+        width,
+        cc.color.apply(null, color),
+      )
     },
     drawEllipse(id, ...args) {
       function drawEllipse(
@@ -193,13 +203,22 @@ export default function lottie(data: any, g: any) {
             target.clear()
             const newPosition = {
               i: this._p.s[0].i.map((dots: [number, number], idx: number) => {
-                return [(dots[0] + this._config.e[0].i[idx][0]) / 2, (dots[1] + this._config.e[0].i[idx][1]) / 2]
+                return [
+                  (dots[0] + this._config.e[0].i[idx][0]) / 2,
+                  (dots[1] + this._config.e[0].i[idx][1]) / 2,
+                ]
               }),
               o: this._p.s[0].o.map((dots: [number, number], idx: number) => {
-                return [(dots[0] + this._config.e[0].o[idx][0]) / 2, (dots[1] + this._config.e[0].o[idx][1]) / 2]
+                return [
+                  (dots[0] + this._config.e[0].o[idx][0]) / 2,
+                  (dots[1] + this._config.e[0].o[idx][1]) / 2,
+                ]
               }),
               v: this._p.s[0].v.map((dots: [number, number], idx: number) => {
-                return [(dots[0] + this._config.e[0].v[idx][0]) / 2, (dots[1] + this._config.e[0].v[idx][1]) / 2]
+                return [
+                  (dots[0] + this._config.e[0].v[idx][0]) / 2,
+                  (dots[1] + this._config.e[0].v[idx][1]) / 2,
+                ]
               }),
             }
             this._p = newPosition
@@ -217,7 +236,15 @@ export default function lottie(data: any, g: any) {
               ])
             }
             d.forEach(item => {
-              target.drawCubicBezier(item[0], item[1], item[2], item[3], 100, 10, cc.color(255, 0, 0, 255))
+              target.drawCubicBezier(
+                item[0],
+                item[1],
+                item[2],
+                item[3],
+                100,
+                10,
+                cc.color(255, 0, 0, 255),
+              )
             })
           }
         },
