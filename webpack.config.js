@@ -10,10 +10,16 @@ module.exports = {
     libraryTarget: 'umd',
   },
   module: {
-    rules: [{ test: /\.ts$/, use: 'ts-loader' }],
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: 'babel-loader',
+      },
+    ],
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.js'],
   },
   mode: 'development',
 }
