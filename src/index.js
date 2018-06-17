@@ -11,8 +11,8 @@ export default function loadAnimation(data, g) {
   // const container = new cc.LayerColor(cc.color(40, 40, 0, 100), data.w, data.h)
   const container = new cc.Layer()
   container.setContentSize(data.w, data.h)
-  container.setScale(0.5)
-  const containerId = 'xxxxx'
+  // container.setScale(0.5)
+  const containerId = 'xxxxxx'
   nodes[containerId] = container
   g.addChild(container)
   window.c = container
@@ -21,17 +21,27 @@ export default function loadAnimation(data, g) {
   const renderer = new LottieRenderer({
     data,
     containerId,
+    // speed: 0.1,
     reverseY: true,
     actions: {
       createPrecomp(id, { width, height }) {
-        nodes[id] = new cc.LayerColor(cc.color(0, 30, 30, 255), width, height)
-        // nodes[id] = new cc.Layer()
+        // nodes[id] = new cc.LayerColor(cc.color(0, 30, 30, 255), width, height)
+        nodes[id] = new cc.Layer()
         nodes[id].setContentSize(width, height)
       },
       createImage(id, { path, name, width, height }) {
         // nodes[id] = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(name))
         nodes[id] = new cc.Sprite(useSpriteFrame ? name : path + name)
         nodes[id].setContentSize(width, height)
+      },
+      show(id) {
+        nodes[id].setVisible(true)
+      },
+      hide(id) {
+        nodes[id].setVisible(false)
+      },
+      delayShow(id, timeout) {
+        addAction(id, cc.sequence([cc.delayTime(timeout), cc.show()]))
       },
       setPosition(id, { x, y }) {
         nodes[id].setPosition(x, y)
