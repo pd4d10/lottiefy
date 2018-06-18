@@ -45,7 +45,9 @@ export default class LottieRenderer {
   private containerId: string // Container
   private actions: Actions
   private assets: { [id: string]: Asset }
-  private layers: { [id: string]: { data: Layer } }
+  private layers: {
+    [id: string]: { data: Layer; width: number; height: number }
+  }
   private generateId: Options['generateId']
   private layerFilter: Options['layerFilter']
   speed: number
@@ -93,11 +95,18 @@ export default class LottieRenderer {
   }
 
   generateAnimations() {
+    this.layers[this.containerId] = {
+      // data: this.data,
+      width: this.data.w,
+      height: this.data.h,
+    }
+
     for (let i = this.data.layers.length; i > 0; i--) {
       const layer = this.data.layers[i - 1]
       const id = this.generateId(layer)
-      this.layers[id] = { data: layer }
-      this._traverseLayer(id, layer, 0, this.data.w, this.data.h)
+      const [width, height] = this.getLayerWidthAndHeight(layer)
+      this.layers[id] = { data: layer, width, height }
+      this._traverseLayer(id, 0, this.containerId)
       this.actions.appendChild(id, this.containerId)
     }
   }
@@ -191,35 +200,25 @@ export default class LottieRenderer {
     return data
   }
 
-  private _applyTransform(
-    layer: Layer,
-    id: string,
-    parentId: string,
-    width: number,
-    height: number,
-    parentWidth: number,
-    parentHeight: number,
-    startFrame: number,
-  ) {
+  private _applyTransform(id: Id, parentId: Id, startFrame: number) {
+    const { width, height, data: layer } = this.layers[id]
+    const parentHeight = this.layers[parentId].height
     this.actions.delayShow(id, this._getTime(layer.st))
 
     // Opacity
-    // if (layer.ks.o) {
-    const { k } = layer.ks.o
+    const oData = layer.ks.o.k
     // as SimpleKeyframe[]
-    if (typeof k === 'number') {
-      this.actions.setOpacity(id, { opacity: k })
-    } else if (k.length) {
-      this.actions.setOpacity(id, { opacity: k[0].s[0] })
+    if (typeof oData === 'number') {
+      this.actions.setOpacity(id, { opacity: oData })
+    } else if (oData.length) {
+      this.actions.setOpacity(id, { opacity: oData[0].s[0] })
       this.actions.setOpacityAnimation(
         id,
-        this._parseSimpleKeyframe(k, startFrame),
+        this._parseSimpleKeyframe(oData, startFrame),
       )
     }
-    // }
 
     // Anchor
-    // if (layer.ks.a && layer.ks.a.k) {
     const [x, y] = layer.ks.a.k
     if (typeof x === 'number' && typeof y === 'number') {
       this.actions.setAnchor(id, {
@@ -231,68 +230,70 @@ export default class LottieRenderer {
     } else {
       console.log('Anchor error: ', id, layer.ks.a)
     }
-    // }
 
     // Position
-    if (layer.ks.p) {
-      const { k } = layer.ks.p
-      if (typeof k[0] === 'number') {
-        this.actions.setPosition(id, {
-          x: k[0],
-          y: this._getCorrectY(k[1], parentHeight),
-        })
-      } else if (k.length) {
-        this.actions.setPosition(id, {
-          x: k[0].s[0],
-          y: this._getCorrectY(k[0].s[1], parentHeight),
-        })
-        this.actions.setPositionAnimation(
-          id,
-          this._parsePositionKeyframe(k, startFrame, parentHeight),
-        )
-      }
+    const pData = layer.ks.p.k
+    if (typeof pData[0] === 'number') {
+      this.actions.setPosition(id, {
+        x: pData[0],
+        y: this._getCorrectY(pData[1], parentHeight),
+      })
+    } else if (pData.length) {
+      this.actions.setPosition(id, {
+        x: pData[0].s[0],
+        y: this._getCorrectY(pData[0].s[1], parentHeight),
+      })
+      this.actions.setPositionAnimation(
+        id,
+        this._parsePositionKeyframe(pData, startFrame, parentHeight),
+      )
     }
 
     // Rotation
-    if (layer.ks.r && layer.ks.r.k) {
-      const { k } = layer.ks.r
-      if (typeof k === 'number') {
-        this.actions.setRotation(id, { rotation: k })
-      } else if (typeof k[0] === 'number') {
-        this.actions.setRotation(id, { rotation: k[0] })
-      } else {
-        this.actions.setRotation(id, { rotation: k[0].s[0] })
-        this.actions.setRotationAnimatation(
-          id,
-          this._parseSimpleKeyframe(k, startFrame),
-        )
-      }
+    const rData = layer.ks.r.k
+    if (typeof rData === 'number') {
+      this.actions.setRotation(id, { rotation: rData })
+    } else if (typeof rData[0] === 'number') {
+      this.actions.setRotation(id, { rotation: rData[0] })
+    } else {
+      this.actions.setRotation(id, { rotation: rData[0].s[0] })
+      this.actions.setRotationAnimatation(
+        id,
+        this._parseSimpleKeyframe(rData, startFrame),
+      )
     }
 
     // Scale
-    if (layer.ks.s) {
-      const { k } = layer.ks.s
-      if (typeof k[0] === 'number') {
-        const [x, y] = k
-        this.actions.setScale(id, { x, y })
-      } else {
-        const [x, y] = k[0].s
-        this.actions.setScale(id, { x, y })
-        this.actions.setScaleAnimatation(
-          id,
-          this._parseSimpleKeyframe(k, startFrame),
-        )
-      }
+    const sData = layer.ks.s.k
+    if (typeof sData[0] === 'number') {
+      const [x, y] = sData
+      this.actions.setScale(id, { x, y })
+    } else {
+      const [x, y] = sData[0].s
+      this.actions.setScale(id, { x, y })
+      this.actions.setScaleAnimatation(
+        id,
+        this._parseSimpleKeyframe(sData, startFrame),
+      )
     }
   }
 
-  private _traverseLayer(
-    currentId: Id,
-    layerData: Layer,
-    startFrame: number,
-    parentWidth: number,
-    parentHeight: number,
-  ) {
+  getLayerWidthAndHeight = (lo: Layer) => {
+    switch (lo.ty) {
+      case LayerType.image:
+        const asset = this.assets[lo.refId] as ImageAsset
+        return [asset.w, asset.h]
+      case LayerType.null:
+        // FIXME: Assume null layer's width and height
+        return (lo as any).ks.a.k.map((x: number) => x * 2)
+      case LayerType.precomp:
+        return [lo.w, lo.h]
+      default:
+    }
+  }
+
+  private _traverseLayer(currentId: Id, startFrame: number, parentId: Id) {
+    const layerData = this.layers[currentId].data
     switch (layerData.ty) {
       // TODO: Add shape, solid and null handler
       case LayerType.shape:
@@ -307,48 +308,16 @@ export default class LottieRenderer {
           height: asset.h,
         })
         this.actions.hide(currentId)
-        // this.actions.appendChild(id, parentId)
-        this._applyTransform(
-          layerData,
-          currentId,
-          '',
-          asset.w,
-          asset.h,
-          parentWidth,
-          parentHeight,
-          startFrame,
-        )
+        this._applyTransform(currentId, parentId, startFrame)
 
         break
       }
       case LayerType.null:
       case LayerType.precomp: {
-        const getLayerWidthAndHeight = (l: any) => {
-          if (l.ty === LayerType.null) {
-            // FIXME: Assume null layer's width and height
-            return l.ks.a.k.map((x: number) => x * 2)
-          } else {
-            if (!l.w) {
-              console.warn('no width', l)
-              return [0, 0]
-            }
-            return [l.w, l.h]
-          }
-        }
-        const [width, height] = getLayerWidthAndHeight(layerData)
+        const [width, height] = this.getLayerWidthAndHeight(layerData)
         this.actions.createPrecomp(currentId, { width, height })
         this.actions.hide(currentId)
-
-        this._applyTransform(
-          layerData,
-          currentId,
-          '',
-          width,
-          height,
-          parentWidth,
-          parentHeight,
-          startFrame,
-        )
+        this._applyTransform(currentId, parentId, startFrame)
 
         const asset = this.assets[layerData.refId] as PrecompAsset
         if (asset && asset.layers) {
@@ -366,7 +335,8 @@ export default class LottieRenderer {
               case LayerType.null:
                 const id = this.generateId(l)
                 ids.push(id)
-                this.layers[id] = { data: l }
+                const [width, height] = this.getLayerWidthAndHeight(l)
+                this.layers[id] = { data: l, width, height }
                 // console.log('layer', id)
 
                 if (l.ind) {
@@ -377,34 +347,12 @@ export default class LottieRenderer {
 
           for (let id of ids) {
             const { parent } = this.layers[id].data
-
-            let parentId, parentWidth, parentHeight
-            if (parent) {
-              parentId = indexIdMapping[parent]
-            } else {
-              parentId = currentId
-            }
-            // console.log(parentId, this.layers)
-            ;[parentWidth, parentHeight] = getLayerWidthAndHeight(
-              this.layers[parentId].data,
-            )
-
-            this._traverseLayer(
-              id,
-              this.layers[id].data,
-              startFrame + layerData.st,
-              parentWidth,
-              parentHeight,
-            )
+            const parentId = parent ? indexIdMapping[parent] : currentId
+            this._traverseLayer(id, startFrame + layerData.st, parentId)
           }
           for (let id of ids) {
             const { parent } = this.layers[id].data
-            let parentId, parentWidth, parentHeight
-            if (parent) {
-              parentId = indexIdMapping[parent]
-            } else {
-              parentId = currentId
-            }
+            const parentId = parent ? indexIdMapping[parent] : currentId
             this.actions.appendChild(id, parentId)
           }
         }

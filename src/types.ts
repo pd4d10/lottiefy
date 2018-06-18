@@ -22,6 +22,11 @@ export type Layer = {
   parent?: number
 }
 
+export interface PrecompLayer extends Layer {
+  w: number
+  h: number
+}
+
 export type ImageAsset = {
   id: Id
   w: number
