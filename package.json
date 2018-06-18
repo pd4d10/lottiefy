@@ -1,36 +1,34 @@
 {
-  "name": "lottie-cocos2dx",
+  "name": "lottie-renderer",
   "version": "0.0.1",
-  "description": "Render After Effects animations on Cocos2d-x engine",
-  "main": "index.js",
-  "files": [],
+  "description": "Lottie renderer",
+  "main": "lib",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "start": "webpack",
+    "build:commonjs": "tsc -d",
     "clear": "rm -rf dist lib",
-    "build:commonjs": "babel-cli",
     "build:umd": "webpack --config webpack.config.production.js",
     "build": "npm run clear && npm run build:commonjs && npm run build:umd",
     "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pd4d10/lottie-cocos2dx.git"
+    "url": "git+https://github.com/pd4d10/lottie-renderer.git"
   },
   "keywords": [],
   "author": "Rongjian Zhang <pd4d10@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pd4d10/lottie-cocos2dx/issues"
+    "url": "https://github.com/pd4d10/lottie-renderer/issues"
   },
-  "homepage": "https://github.com/pd4d10/lottie-cocos2dx",
-  "dependencies": {
-    "@types/uuid": "^3.4.3",
-    "uuid": "^3.2.1"
-  },
+  "homepage": "https://github.com/pd4d10/lottie-renderer",
+  "dependencies": {},
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.46",
-    "@babel/preset-env": "^7.0.0-beta.46",
-    "babel-loader": "^8.0.0-beta",
+    "ts-loader": "^4.2.0",
+    "typescript": "^2.7.2",
     "webpack": "^4.6.0",
     "webpack-cli": "^2.1.2",
     "webpack-merge": "^4.1.2"

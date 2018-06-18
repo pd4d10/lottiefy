@@ -5,21 +5,15 @@ module.exports = {
   devtool: 'inline-source-map',
   output: {
     path: path.resolve('./dist'),
-    filename: 'lottie-cocos2dx.js',
-    library: 'lottie',
+    filename: 'lottie-renderer.js',
+    library: 'lottieRenderer',
     libraryTarget: 'umd',
   },
   module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: 'babel-loader',
-      },
-    ],
+    rules: [{ test: /\.ts$/, use: 'ts-loader' }],
   },
   resolve: {
-    extensions: ['.js'],
+    extensions: ['.ts', '.js'],
   },
   mode: 'development',
 }
