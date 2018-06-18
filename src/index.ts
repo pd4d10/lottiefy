@@ -93,7 +93,8 @@ export default class LottieRenderer {
   }
 
   generateAnimations() {
-    for (let layer of this.data.layers) {
+    for (let i = this.data.layers.length; i > 0; i--) {
+      const layer = this.data.layers[i - 1]
       const id = this.generateId(layer)
       this.layers[id] = { data: layer }
       this._traverseLayer(id, layer, 0, this.data.w, this.data.h)
@@ -352,19 +353,11 @@ export default class LottieRenderer {
         const asset = this.assets[layerData.refId] as PrecompAsset
         if (asset && asset.layers) {
           // TODO: Fix layer order
-          const sortedLayers = []
-          for (let l of asset.layers) {
-            if (l.parent) {
-              sortedLayers.push(l)
-            } else {
-              sortedLayers.unshift(l)
-            }
-          }
-
           const indexIdMapping: { [index: number]: Id } = {}
           const ids = []
 
-          for (let l of sortedLayers) {
+          for (let i = asset.layers.length; i > 0; i--) {
+            const l = asset.layers[i - 1]
             if (!this.layerFilter(l)) continue
 
             switch (l.ty) {
@@ -403,7 +396,15 @@ export default class LottieRenderer {
               parentWidth,
               parentHeight,
             )
-
+          }
+          for (let id of ids) {
+            const { parent } = this.layers[id].data
+            let parentId, parentWidth, parentHeight
+            if (parent) {
+              parentId = indexIdMapping[parent]
+            } else {
+              parentId = currentId
+            }
             this.actions.appendChild(id, parentId)
           }
         }
