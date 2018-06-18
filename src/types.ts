@@ -1,4 +1,4 @@
-type Id = string
+export type Id = string
 
 export type Layer = {
   ty: LayerType
