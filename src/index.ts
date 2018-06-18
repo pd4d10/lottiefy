@@ -100,15 +100,7 @@ export default class LottieRenderer {
       width: this.data.w,
       height: this.data.h,
     }
-
-    for (let i = this.data.layers.length; i > 0; i--) {
-      const layer = this.data.layers[i - 1]
-      const id = this.generateId(layer)
-      const [width, height] = this.getLayerWidthAndHeight(layer)
-      this.layers[id] = { data: layer, width, height }
-      this._traverseLayer(id, 0, this.containerId)
-      this.actions.appendChild(id, this.containerId)
-    }
+    this._traverseLayers(this.containerId, this.data.layers, 0, 0)
   }
 
   private _convertBezierShapeToPoints(
@@ -219,13 +211,13 @@ export default class LottieRenderer {
     }
 
     // Anchor
-    const [x, y] = layer.ks.a.k
-    if (typeof x === 'number' && typeof y === 'number') {
+    const aData = layer.ks.a.k
+    if (typeof aData[0] === 'number' && typeof aData[1] === 'number') {
       this.actions.setAnchor(id, {
-        x: x / width,
-        y: this._getCorrectY(y, height) / height,
-        ax: x,
-        ay: this._getCorrectY(y, height),
+        x: aData[0] / width,
+        y: this._getCorrectY(aData[1], height) / height,
+        ax: aData[0],
+        ay: this._getCorrectY(aData[1], height),
       })
     } else {
       console.log('Anchor error: ', id, layer.ks.a)
@@ -321,44 +313,48 @@ export default class LottieRenderer {
 
         const asset = this.assets[layerData.refId] as PrecompAsset
         if (asset && asset.layers) {
-          // TODO: Fix layer order
-          const indexIdMapping: { [index: number]: Id } = {}
-          const ids = []
-
-          for (let i = asset.layers.length; i > 0; i--) {
-            const l = asset.layers[i - 1]
-            if (!this.layerFilter(l)) continue
-
-            switch (l.ty) {
-              case LayerType.image:
-              case LayerType.precomp:
-              case LayerType.null:
-                const id = this.generateId(l)
-                ids.push(id)
-                const [width, height] = this.getLayerWidthAndHeight(l)
-                this.layers[id] = { data: l, width, height }
-                // console.log('layer', id)
-
-                if (l.ind) {
-                  indexIdMapping[l.ind] = id
-                }
-            }
-          }
-
-          for (let id of ids) {
-            const { parent } = this.layers[id].data
-            const parentId = parent ? indexIdMapping[parent] : currentId
-            this._traverseLayer(id, startFrame + layerData.st, parentId)
-          }
-          for (let id of ids) {
-            const { parent } = this.layers[id].data
-            const parentId = parent ? indexIdMapping[parent] : currentId
-            this.actions.appendChild(id, parentId)
-          }
+          this._traverseLayers(currentId, asset.layers, startFrame, layerData.st)
         }
 
         break
       }
     }
+  }
+
+  private _traverseLayers(currentId: Id, layers: Layer[], startFrame: number, currentStartFrame: number) {
+    const indexIdMapping: { [index: number]: Id } = {}
+    const ids = []
+
+    for (let i = layers.length; i > 0; i--) {
+      const l = layers[i - 1]
+      if (!this.layerFilter(l)) continue
+
+      switch (l.ty) {
+        case LayerType.image:
+        case LayerType.precomp:
+        case LayerType.null:
+          const id = this.generateId(l)
+          ids.push(id)
+          const [width, height] = this.getLayerWidthAndHeight(l)
+          this.layers[id] = { data: l, width, height }
+          // console.log('layer', id)
+
+          if (l.ind) {
+            indexIdMapping[l.ind] = id
+          }
+      }
+    }
+
+    for (let id of ids) {
+      const { parent } = this.layers[id].data
+      const parentId = parent ? indexIdMapping[parent] : currentId
+      this._traverseLayer(id, startFrame + currentStartFrame, parentId)
+    }
+    for (let id of ids) {
+      const { parent } = this.layers[id].data
+      const parentId = parent ? indexIdMapping[parent] : currentId
+      this.actions.appendChild(id, parentId)
+    }
+  }
   }
 }
