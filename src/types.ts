@@ -12,6 +12,14 @@ export type Layer = {
     a: any
     s: any
   }
+  /**
+   * Layer index in AE. Used for parenting and expressions.
+   */
+  ind?: number
+  /**
+   * Layer Parent. Uses ind of parent.
+   */
+  parent?: number
 }
 
 export type ImageAsset = {

@@ -1,24 +1,19 @@
 import {
   Actions,
   LayerType,
-  Shape,
-  Effect,
-  ArrayColor,
   Keyframe,
-  Point,
   BezierPoints,
   PositionAnimationData,
   SimpleKeyframe,
   SimpleAnimationData,
   BezierShape,
   ArrayPoint,
-  ShapeKeyframe,
-  ShapeAnimationData,
   AnimationData,
   Asset,
   Layer,
   ImageAsset,
   PrecompAsset,
+  Id,
 } from './types'
 import { getId } from './utils'
 
@@ -40,7 +35,7 @@ export type Options = {
   /**
    * Custom id generate function
    */
-  generateId: () => string
+  generateId: (layer: Layer) => string
 
   layerFilter: (layer: Layer) => boolean
 }
@@ -49,7 +44,8 @@ export default class LottieRenderer {
   private data: AnimationData
   private containerId: string // Container
   private actions: Actions
-  private assets: { [key: string]: Asset }
+  private assets: { [id: string]: Asset }
+  private layers: { [id: string]: { data: Layer } }
   private generateId: Options['generateId']
   private layerFilter: Options['layerFilter']
   speed: number
@@ -75,6 +71,7 @@ export default class LottieRenderer {
       this.assets[asset.id] = asset
     }
 
+    this.layers = {}
     this.containerId = containerId
     this.actions = actions
     this.reverseY = reverseY
@@ -97,7 +94,10 @@ export default class LottieRenderer {
 
   generateAnimations() {
     for (let layer of this.data.layers) {
-      this._traverseLayer(layer, this.containerId, 0, this.data.w, this.data.h)
+      const id = this.generateId(layer)
+      this.layers[id] = { data: layer }
+      this._traverseLayer(id, layer, 0, this.data.w, this.data.h)
+      this.actions.appendChild(id, this.containerId)
     }
   }
 
@@ -286,35 +286,31 @@ export default class LottieRenderer {
   }
 
   private _traverseLayer(
-    layer: Layer,
-    parentId: string,
+    currentId: Id,
+    layerData: Layer,
     startFrame: number,
     parentWidth: number,
     parentHeight: number,
   ) {
-    if (!this.layerFilter(layer)) return
-
-    switch (layer.ty) {
+    switch (layerData.ty) {
+      // TODO: Add shape, solid and null handler
       case LayerType.shape:
       case LayerType.solid:
         break
       case LayerType.image: {
-        const id = this.generateId()
-        layer.xid = id
-        const asset = this.assets[layer.refId] as ImageAsset
-        // if (!asset) break
-        this.actions.createImage(id, {
+        const asset = this.assets[layerData.refId] as ImageAsset
+        this.actions.createImage(currentId, {
           path: asset.u,
           name: asset.p,
           width: asset.w,
           height: asset.h,
         })
-        this.actions.hide(id)
-        this.actions.appendChild(id, parentId)
+        this.actions.hide(currentId)
+        // this.actions.appendChild(id, parentId)
         this._applyTransform(
-          layer,
-          id,
-          parentId,
+          layerData,
+          currentId,
+          '',
           asset.w,
           asset.h,
           parentWidth,
@@ -326,25 +322,26 @@ export default class LottieRenderer {
       }
       case LayerType.null:
       case LayerType.precomp: {
-        const id = this.generateId()
-        layer.xid = id
         const getLayerWidthAndHeight = (l: any) => {
           if (l.ty === LayerType.null) {
             // FIXME: Assume null layer's width and height
             return l.ks.a.k.map((x: number) => x * 2)
           } else {
-            if (!l.w) return [0, 0]
+            if (!l.w) {
+              console.warn('no width', l)
+              return [0, 0]
+            }
             return [l.w, l.h]
           }
         }
-        const [width, height] = getLayerWidthAndHeight(layer)
-        this.actions.createPrecomp(id, { width, height })
-        this.actions.hide(id)
+        const [width, height] = getLayerWidthAndHeight(layerData)
+        this.actions.createPrecomp(currentId, { width, height })
+        this.actions.hide(currentId)
 
         this._applyTransform(
-          layer,
-          id,
-          parentId,
+          layerData,
+          currentId,
+          '',
           width,
           height,
           parentWidth,
@@ -352,49 +349,65 @@ export default class LottieRenderer {
           startFrame,
         )
 
-        const asset = this.assets[layer.refId] as PrecompAsset
+        const asset = this.assets[layerData.refId] as PrecompAsset
         if (asset && asset.layers) {
-          // Need
-          // FIXME: parent before child
+          // TODO: Fix layer order
           const sortedLayers = []
-          const indexIdMapping: any = {}
           for (let l of asset.layers) {
             if (l.parent) {
               sortedLayers.push(l)
             } else {
               sortedLayers.unshift(l)
             }
-            if (l.ind) {
-              indexIdMapping[l.ind] = l
+          }
+
+          const indexIdMapping: { [index: number]: Id } = {}
+          const ids = []
+
+          for (let l of sortedLayers) {
+            if (!this.layerFilter(l)) continue
+
+            switch (l.ty) {
+              case LayerType.image:
+              case LayerType.precomp:
+              case LayerType.null:
+                const id = this.generateId(l)
+                ids.push(id)
+                this.layers[id] = { data: l }
+                // console.log('layer', id)
+
+                if (l.ind) {
+                  indexIdMapping[l.ind] = id
+                }
             }
           }
 
-          for (let l of sortedLayers) {
-            let correctId, parentWidth, parentHeight
-            if (l.parent) {
-              const parent = indexIdMapping[l.parent]
-              correctId = parent.xid
-              ;[parentWidth, parentHeight] = getLayerWidthAndHeight(parent)
+          for (let id of ids) {
+            const { parent } = this.layers[id].data
+
+            let parentId, parentWidth, parentHeight
+            if (parent) {
+              parentId = indexIdMapping[parent]
             } else {
-              correctId = id
-              parentWidth = width
-              parentHeight = height
+              parentId = currentId
             }
+            // console.log(parentId, this.layers)
+            ;[parentWidth, parentHeight] = getLayerWidthAndHeight(
+              this.layers[parentId].data,
+            )
 
             this._traverseLayer(
-              l,
-              correctId,
-              startFrame + layer.st,
+              id,
+              this.layers[id].data,
+              startFrame + layerData.st,
               parentWidth,
               parentHeight,
             )
+
+            this.actions.appendChild(id, parentId)
           }
         }
 
-        if (!parentId) {
-          console.log(layer)
-        }
-        this.actions.appendChild(id, parentId)
         break
       }
     }
