@@ -356,5 +356,4 @@ export default class LottieRenderer {
       this.actions.appendChild(id, parentId)
     }
   }
-  }
 }
