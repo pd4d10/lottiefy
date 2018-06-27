@@ -46,7 +46,7 @@ export default class LottieRenderer {
   private actions: Actions
   private assets: { [id: string]: Asset }
   private layers: {
-    [id: string]: { data: Layer; width: number; height: number }
+    [id: string]: { data?: Layer; width: number; height: number }
   }
   private generateId: Options['generateId']
   private layerFilter: Options['layerFilter']
@@ -150,7 +150,6 @@ export default class LottieRenderer {
 
   /**
    * Simple keyframe, like opacity, anchor and scale
-   * @param keyframes
    */
   private _parseSimpleKeyframe(
     keyframes: SimpleKeyframe[],
@@ -212,16 +211,13 @@ export default class LottieRenderer {
 
     // Anchor
     const aData = layer.ks.a.k
-    if (typeof aData[0] === 'number' && typeof aData[1] === 'number') {
-      this.actions.setAnchor(id, {
-        x: aData[0] / width,
-        y: this._getCorrectY(aData[1], height) / height,
-        ax: aData[0],
-        ay: this._getCorrectY(aData[1], height),
-      })
-    } else {
-      console.log('Anchor error: ', id, layer.ks.a)
-    }
+    const aY = this._getCorrectY(aData[1], height)
+    this.actions.setAnchor(id, {
+      x: aData[0],
+      y: aY,
+      rx: aData[0] / width,
+      ry: aY / height,
+    })
 
     // Position
     const pData = layer.ks.p.k
@@ -279,7 +275,7 @@ export default class LottieRenderer {
         // FIXME: Assume null layer's width and height
         return (lo as any).ks.a.k.map((x: number) => x * 2)
       case LayerType.precomp:
-        return [lo.w, lo.h]
+        return [(lo as any).w, (lo as any).h]
       default:
     }
   }
@@ -313,7 +309,12 @@ export default class LottieRenderer {
 
         const asset = this.assets[layerData.refId] as PrecompAsset
         if (asset && asset.layers) {
-          this._traverseLayers(currentId, asset.layers, startFrame, layerData.st)
+          this._traverseLayers(
+            currentId,
+            asset.layers,
+            startFrame,
+            layerData.st,
+          )
         }
 
         break
@@ -321,7 +322,12 @@ export default class LottieRenderer {
     }
   }
 
-  private _traverseLayers(currentId: Id, layers: Layer[], startFrame: number, currentStartFrame: number) {
+  private _traverseLayers(
+    currentId: Id,
+    layers: Layer[],
+    startFrame: number,
+    currentStartFrame: number,
+  ) {
     const indexIdMapping: { [index: number]: Id } = {}
     const ids = []
 

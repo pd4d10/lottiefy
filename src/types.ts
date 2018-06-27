@@ -75,8 +75,19 @@ export type Actions = {
     },
   ): void
 
+  /**
+   * Show element
+   */
   show(id: Id): void
+
+  /**
+   * Hide element
+   */
   hide(id: Id): void
+
+  /**
+   * Show element with delay
+   */
   delayShow(id: Id, timeout: number): void
 
   /**
@@ -87,24 +98,24 @@ export type Actions = {
     payload: {
       x: number
       y: number
-      ax: number
-      ay: number
+      /**
+       * Relative X: x / width
+       */
+      rx: number
+      /**
+       * Relative Y: y / height
+       */
+      ry: number
     },
   ): any
 
   /**
-   * Set absolute position of an element
+   * Set position of an element
    */
-  setPosition(
-    id: Id,
-    payload: {
-      x: number
-      y: number
-    },
-  ): void
+  setPosition(id: Id, payload: { x: number; y: number }): void
 
   /**
-   * Set animation of position
+   * Set animation of position, Bezier curve
    */
   setPositionAnimation(id: Id, payload: PositionAnimationData[]): void
 
@@ -114,22 +125,14 @@ export type Actions = {
   setRotation(id: Id, payload: { rotation: number }): void
 
   /**
-   *
-   * @param id
-   * @param payload
+   * Set animation of rotation
    */
   setRotationAnimatation(id: Id, payload: SimpleAnimationData[]): void
 
   /**
-   * Set scale of an element
+   * Set scale percent of an element
    */
-  setScale(
-    id: Id,
-    payload: {
-      x: number
-      y: number
-    },
-  ): void
+  setScale(id: Id, payload: { x: number; y: number }): void
 
   /**
    * Set scale animation of an element
@@ -137,16 +140,12 @@ export type Actions = {
   setScaleAnimatation(id: Id, payload: SimpleAnimationData[]): void
 
   /**
-   *
-   * @param id Element id
-   * @param opacity Opacity of element, 0-100
+   * Set opacity of an element, 0-100
    */
   setOpacity(id: Id, payload: { opacity: number }): void
 
   /**
-   * Set (AKA fade)
-   * @param id
-   * @param payload
+   * Set opacity animation
    */
   setOpacityAnimation(id: Id, payload: SimpleAnimationData[]): void
 
@@ -154,12 +153,6 @@ export type Actions = {
    * Append an element as child to another element
    */
   appendChild(id: Id, parentId: Id): void
-
-  /**
-   * Get node by id
-   * @param id Element id
-   */
-  getNodeById(id: Id): any
 
   // TODO: shapes
   // createShape(id: Id, strokeWidth: number): void
