@@ -1,0 +1,78 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Lottie Renderer Demo</title>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <style>
+    body {
+      margin-top: 20px;
+    }
+    iframe {
+      width: 600px;
+      height: 600px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <form class="form">
+          <div class="form-group">
+            <label for="renderer">Renderer</label>
+            <select class="custom-select" id="data">
+              <option value="0">Cocos2d-x</option>
+              <option value="1">Cocos2d-x Lua</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="data">Lottie file</label>
+            <select class="custom-select" id="data">
+              <option value="0">Flying balloons</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="speed">Speed</label>
+            <input id="speed" type="number" step="0.1" value="1" class="form-control" />
+          </div>
+          <button type="submit" class="btn btn-primary">Run</button>
+        </form>
+      </div>
+      <div class="col-sm">
+        <iframe src="https://pd4d10.github.io/lottie-cocos2dx/"></iframe>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // document.querySelector('#data').addEventListener('change', console.log)
+    document.querySelector('form').addEventListener('submit', e => {
+      e.preventDefault()
+      let path;
+      switch (e.target[0].value) {
+        case '0':
+          path = 'lottie-cocos2dx'
+          break
+        case '1':
+          path = 'lottie-cocos2dx-lua'
+          break
+        case '2':
+          path = 'lottie-spritejs'
+          break
+        default:
+          throw new Error('Should not be here')
+      }
+      let speed = e.target[2].value
+      // console.log
+      document.querySelector('iframe').src = `https://pd4d10.github.io/${path}/?speed=${speed}`
+    })
+  </script>
+</body>
+
+</html>
