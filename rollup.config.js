@@ -3,6 +3,7 @@ import { uglify } from 'rollup-plugin-uglify'
 
 const licensePlugin = license({
   banner: `/**
+ * Lottie Renderer v${require('./package.json').version}
  * https://github.com/pd4d10/lottie-renderer
  * Copyright (c) Rongjian Zhang
  * Released under the MIT License
