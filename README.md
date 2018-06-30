@@ -37,8 +37,8 @@ Or just use UMD bundle via `script` tag:
 import LottieRenderer from 'lottie-renderer'
 
 const renderer = new LottieRenderer({
-  data: {}, // JSON data exported by Bodymovin
-  containerId: '',
+  animationData: {}, // JSON data exported by Bodymovin
+  containerId: '', // The id of container to render
   actions: {
     createPrecomp(id, payload) {
       // Specify how to create a precomp
@@ -49,16 +49,21 @@ const renderer = new LottieRenderer({
       // ...
     },
     // ...
+
     // List of all actions:
     // https://github.com/pd4d10/lottie-renderer/blob/master/src/types.ts#L53
+    // Notice that all actions should be specified to make it works correctly
   },
 
   // Some engines like Cocos2d-x have opposite Y coordinate with Adobe After effects
   // Set reverseY to true in these cases, default is false
   reverseY: false,
+
+  // Set animation speed
+  speed: 1,
 })
 
-// Run generateAnimations
+// Call generateAnimations to run all actions
 renderer.generateAnimations()
 ```
 

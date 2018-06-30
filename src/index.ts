@@ -21,7 +21,7 @@ export type Options = {
   /**
    * JSON data exported by Bodymovin
    */
-  data: AnimationData
+  animationData: AnimationData
   /**
    * Id of container to render
    */
@@ -59,7 +59,7 @@ export default class LottieRenderer {
   private reverseY: boolean
 
   constructor({
-    data,
+    animationData,
     containerId,
     actions,
     reverseY = false,
@@ -67,10 +67,10 @@ export default class LottieRenderer {
     speed = 1,
     layerFilter = () => true,
   }: Options) {
-    this.data = data
+    this.data = animationData
     this.assets = {}
     // Convert assets to a map for easily accessing
-    for (let asset of data.assets) {
+    for (let asset of this.data.assets) {
       this.assets[asset.id] = asset
     }
 
