@@ -1,5 +1,7 @@
 # lottie-renderer
 
+![npm](https://img.shields.io/npm/v/lottie-renderer.svg)
+
 A toolkit to customize Lottie renderer. Demo here: https://pd4d10.github.io/lottie-renderer/
 
 ## Motivation
