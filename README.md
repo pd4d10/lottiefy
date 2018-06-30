@@ -64,11 +64,11 @@ renderer.generateAnimations()
 
 ## Roadmap
 
-[x] Precomp
-[x] Image
-[] Shape
-[] Effect
-[] ...
+- [x] Precomp
+- [x] Image
+- [ ] Shape
+- [ ] Effect
+- [ ] ...
 
 ## License
 
