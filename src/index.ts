@@ -46,7 +46,8 @@ export default class LottieRenderer {
   private actions: Actions
   private assets: { [id: string]: Asset }
   private layers: {
-    [id: string]: { data?: Layer; width: number; height: number }
+    // [id: string]: { data: Layer; width: number; height: number }
+    [id: string]: any // TODO: Use correct type
   }
   private generateId: Options['generateId']
   private layerFilter: Options['layerFilter']
