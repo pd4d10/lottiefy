@@ -4,11 +4,9 @@ A toolkit to customize Lottie renderer. Demo here: https://pd4d10.github.io/lott
 
 ## Motivation
 
-[Lottie](http://airbnb.io/lottie/) is a solution to transform Adobe After Effects animations directly to code. It already has web, Android and iOS renderers.
+[Lottie](http://airbnb.io/lottie/) is a solution to transform Adobe After Effects animations directly to code. It already has web, Android and iOS renderers. But Sometimes we need more control. For example, developers may want to render Lottie to other engines, like Cocos2d-x and PixiJS. With [lottie-renderer](https://github.com/pd4d10/lottie-renderer), you can customize your own renderer in these cases.
 
-But Sometimes we need more control. For example, developers may want to render Lottie to other engines like Cocos2d-x and PixiJS. [lottie-renderer](https://github.com/pd4d10/lottie-renderer) comes to rescue in these cases.
-
-**Notice**: It hasn't reached 1.x, and may cause breaking changes in future. Please submit an issue if something went wrong.
+**Notice**: It is 0.x currently, and may have breaking changes in future. Please submit an issue if something went wrong.
 
 ## Use cases
 
