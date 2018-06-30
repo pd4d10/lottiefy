@@ -10,23 +10,27 @@ const licensePlugin = license({
  */`,
 })
 
+const inputFile = 'lib/index.js'
+const outputName = 'LottieRenderer'
+const outputFile = 'dist/lottie-renderer'
+
 export default [
   {
-    input: 'lib/index.js',
+    input: inputFile,
     plugins: [licensePlugin],
     output: {
       format: 'umd',
-      name: 'LottieRenderer',
-      file: 'dist/lottie-renderer.js',
+      name: outputName,
+      file: outputFile + '.js',
     },
   },
   {
-    input: 'lib/index.js',
+    input: inputFile,
     plugins: [uglify(), licensePlugin],
     output: {
       format: 'umd',
-      name: 'LottieRenderer',
-      file: 'dist/lottie-renderer.min.js',
+      name: outputName,
+      file: outputFile + '.min.js',
     },
   },
 ]
