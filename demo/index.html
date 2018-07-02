@@ -32,7 +32,7 @@
             <label for="renderer">Renderer</label>
             <select class="custom-select" id="data">
               <option value="0">Cocos2d-x</option>
-              <option value="1">Cocos2d-x Lua</option>
+              <!-- <option value="1">Cocos2d-x Lua</option> -->
             </select>
           </div>
           <div class="form-group">
@@ -64,12 +64,12 @@
         case '0':
           path = 'lottie-cocos2dx'
           break
-        case '1':
-          path = 'lottie-cocos2dx-lua'
-          break
-        case '2':
-          path = 'lottie-spritejs'
-          break
+        // case '1':
+        //   path = 'lottie-cocos2dx-lua'
+        //   break
+        // case '2':
+        //   path = 'lottie-spritejs'
+        //   break
         default:
           throw new Error('Should not be here')
       }
