@@ -4,7 +4,7 @@ import { uglify } from 'rollup-plugin-uglify'
 const licensePlugin = license({
   banner: `/**
  * Lottie Renderer v${require('./package.json').version}
- * https://github.com/pd4d10/lottie-renderer
+ * https://github.com/pd4d10/lottiefy
  * Copyright (c) Rongjian Zhang
  * Released under the MIT License
  */`,
@@ -12,7 +12,7 @@ const licensePlugin = license({
 
 const inputFile = 'lib/index.js'
 const outputName = 'LottieRenderer'
-const outputFile = 'dist/lottie-renderer'
+const outputFile = 'dist/lottiefy'
 
 export default [
   {

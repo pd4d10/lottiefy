@@ -1,12 +1,12 @@
-# lottie-renderer
+# lottiefy
 
-![npm](https://img.shields.io/npm/v/lottie-renderer.svg)
+![npm](https://img.shields.io/npm/v/lottiefy.svg)
 
-A toolkit to customize Lottie renderer. Demo here: https://pd4d10.github.io/lottie-renderer/
+A toolkit to customize Lottie renderer. Demo here: https://pd4d10.github.io/lottiefy/
 
 ## Motivation
 
-[Lottie](http://airbnb.io/lottie/) is a solution to transform Adobe After Effects animations directly to code. It already has web, Android and iOS renderers. But Sometimes we need more control. For example, developers may want to render Lottie to other engines, like Cocos2d-x and PixiJS. With [lottie-renderer](https://github.com/pd4d10/lottie-renderer), you can customize your own renderer in these cases.
+[Lottie](http://airbnb.io/lottie/) is a solution to transform Adobe After Effects animations directly to code. It already has web, Android and iOS renderers. But Sometimes we need more control. For example, developers may want to render Lottie to other engines, like Cocos2d-x and PixiJS. With [lottiefy](https://github.com/pd4d10/lottiefy), you can customize your own renderer in these cases.
 
 **Notice**: It is 0.x currently, and may have breaking changes in future. Please submit an issue if something went wrong.
 
@@ -22,19 +22,19 @@ A toolkit to customize Lottie renderer. Demo here: https://pd4d10.github.io/lott
 Install via NPM:
 
 ```sh
-npm install --save lottie-renderer
+npm install --save lottiefy
 ```
 
 Or just use UMD bundle via `script` tag:
 
 ```html
-<script src="https://unpkg.com/lottie-renderer/dist/lottie-renderer.min.js"></script>
+<script src="https://unpkg.com/lottiefy/dist/lottiefy.min.js"></script>
 ```
 
 ## Usage
 
 ```js
-import LottieRenderer from 'lottie-renderer'
+import LottieRenderer from 'lottiefy'
 
 const renderer = new LottieRenderer({
   animationData: {}, // JSON data exported by Bodymovin
@@ -51,7 +51,7 @@ const renderer = new LottieRenderer({
     // ...
 
     // List of all actions:
-    // https://github.com/pd4d10/lottie-renderer/blob/master/src/types.ts#L53
+    // https://github.com/pd4d10/lottiefy/blob/master/src/types.ts#L53
     // Notice that all actions should be specified to make it works correctly
   },
 
