@@ -40,7 +40,7 @@ export type Options = {
   layerFilter: (layer: Layer) => boolean
 }
 
-export default class LottieRenderer {
+export class LottieRenderer {
   private data: AnimationData
   private containerId: string // Container
   private actions: Actions

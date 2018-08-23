@@ -34,7 +34,7 @@ Or just use UMD bundle via `script` tag:
 ## Usage
 
 ```js
-import LottieRenderer from 'lottiefy'
+import { LottieRenderer } from 'lottiefy'
 
 const renderer = new LottieRenderer({
   animationData: {}, // JSON data exported by Bodymovin

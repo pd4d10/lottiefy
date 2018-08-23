@@ -11,7 +11,7 @@ const licensePlugin = license({
 })
 
 const inputFile = 'lib/index.js'
-const outputName = 'LottieRenderer'
+const outputName = 'lottiefy'
 const outputFile = 'dist/lottiefy'
 
 export default [
