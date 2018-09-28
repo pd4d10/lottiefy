@@ -1,0 +1,42 @@
+{
+  "name": "@lottiefy/cocos2dx-lua",
+  "version": "0.0.4",
+  "description": "Render Lottie to Cocos2d-x Lua binding",
+  "keywords": [
+    "lottie",
+    "cocos2dx",
+    "lua"
+  ],
+  "author": "Rongjian Zhang <pd4d10@gmail.com>",
+  "homepage": "https://github.com/pd4d10/lottiefy/tree/master/packages/cocos2dx-lua#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pd4d10/lottiefy.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/pd4d10/lottiefy/issues"
+  },
+  "dependencies": {
+    "lottiefy": "^0.0.4"
+  },
+  "devDependencies": {
+    "rollup": "^0.62.0",
+    "rollup-plugin-license": "^0.6.0",
+    "rollup-plugin-uglify": "^4.0.0"
+  }
+}

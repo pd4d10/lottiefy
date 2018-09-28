@@ -1,0 +1,51 @@
+{
+  "name": "@lottiefy/cocos2dx",
+  "version": "0.0.4",
+  "description": "Render Lottie to Cocos2d-x",
+  "keywords": [
+    "lottie",
+    "cocos2dx"
+  ],
+  "author": "Rongjian Zhang <pd4d10@gmail.com>",
+  "homepage": "https://github.com/pd4d10/lottiefy/tree/master/packages/cocos2dx#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pd4d10/lottiefy.git"
+  },
+  "scripts": {
+    "start": "rollup --config rollup.config.js --watch",
+    "clear": "rm -rf dist lib",
+    "build": "rollup --config rollup.config.js",
+    "prepublishOnly": "npm run build"
+  },
+  "bugs": {
+    "url": "https://github.com/pd4d10/lottiefy/issues"
+  },
+  "dependencies": {
+    "@types/uuid": "^3.4.3",
+    "lottiefy": "^0.0.4",
+    "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.46",
+    "@babel/preset-env": "^7.0.0-beta.46",
+    "rollup": "^0.61.0",
+    "rollup-plugin-babel": "^4.0.0-beta.5",
+    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-license": "^0.6.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-uglify": "^4.0.0"
+  }
+}
