@@ -10,11 +10,13 @@ A toolkit to customize Lottie renderer. Demo here: https://lottiefy.js.org
 
 ## Use cases
 
-- [@lottiefy/cocos2dx](https://github.com/pd4d10/lottiefy/tree/master/packages/cocos2dx): Render Lottie to Cocos2d-x(JS binding)
-- [@lottiefy/cocos2dx-lua](https://github.com/pd4d10/lottiefy/tree/master/packages/cocos2dx-lua) Generate Lua code to render Lottie to Cocos2d-x(Lua binding)
-- [@lottiefy/pixi](https://github.com/pd4d10/lottiefy/tree/master/packages/pixi): Render Lottie to PixiJS [WIP]
-- [@lottiefy/spritejs](https://github.com/pd4d10/lottiefy/tree/master/packages/spritejs): Render Lottie to SpriteJS [WIP]
-- ...
+| Renderer                                                                                       | Description                                                  |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [@lottiefy/cocos2dx](https://github.com/pd4d10/lottiefy/tree/master/packages/cocos2dx)         | Render Lottie to Cocos2d-x(JS binding)                       |
+| [@lottiefy/cocos2dx-lua](https://github.com/pd4d10/lottiefy/tree/master/packages/cocos2dx-lua) | Generate Lua code to render Lottie to Cocos2d-x(Lua binding) |
+| [@lottiefy/pixi](https://github.com/pd4d10/lottiefy/tree/master/packages/pixi)                 | Render Lottie to PixiJS [WIP]                                |
+| [@lottiefy/spritejs](https://github.com/pd4d10/lottiefy/tree/master/packages/spritejs)         | Render Lottie to SpriteJS [WIP]                              |
+| ...                                                                                            | ...                                                          |
 
 ## Installation
 
