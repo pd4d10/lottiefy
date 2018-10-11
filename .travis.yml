@@ -1,5 +1,5 @@
 deploy:
-  local-dir: demo
+  local-dir: docs
   provider: pages
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
