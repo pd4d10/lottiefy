@@ -1,8 +1,6 @@
-# lottiefy
+# lottiefy ![npm](https://img.shields.io/npm/v/lottiefy.svg)
 
-![npm](https://img.shields.io/npm/v/lottiefy.svg)
-
-A toolkit to customize Lottie renderer. Demo here: https://pd4d10.github.io/lottiefy/
+A toolkit to customize Lottie renderer. Demo here: https://lottiefy.js.org
 
 ## Motivation
 
@@ -12,9 +10,10 @@ A toolkit to customize Lottie renderer. Demo here: https://pd4d10.github.io/lott
 
 ## Use cases
 
-- [lottie-cocos2dx](https://github.com/pd4d10/lottie-cocos2dx): Render Lottie to Cocos2d-x(JS binding)
-- [lottie-cocos2dx-lua](https://github.com/pd4d10/lottie-cocos2dx-lua) Generate Lua code to render Lottie to Cocos2d-x(Lua binding)
-- [lottie-pixi](https://github.com/pd4d10/lottie-pixi): Render Lottie to PixiJS [Work in progress]
+- [@lottify/cocos2dx](https://github.com/pd4d10/lottiefy/packages/cocos2dx): Render Lottie to Cocos2d-x(JS binding)
+- [@lottify/cocos2dx-lua](https://github.com/pd4d10/lottiefy/packages/cocos2dx-lua) Generate Lua code to render Lottie to Cocos2d-x(Lua binding)
+- [@lottify/pixi](https://github.com/pd4d10/lottiefy/packages/pixi): Render Lottie to PixiJS [WIP]
+- [@lottify/spritejs](https://github.com/pd4d10/lottiefy/packages/spritejs): Render Lottie to SpriteJS [WIP]
 - ...
 
 ## Installation
