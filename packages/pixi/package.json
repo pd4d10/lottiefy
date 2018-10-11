@@ -1,0 +1,29 @@
+{
+  "name": "@lottiefy/pixi",
+  "version": "0.0.4",
+  "description": "Render Lottie to Pixi",
+  "keywords": [
+    "lottie",
+    "pixi"
+  ],
+  "author": "Rongjian Zhang <pd4d10@gmail.com>",
+  "homepage": "https://github.com/pd4d10/lottiefy/tree/master/packages/pixi#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pd4d10/lottiefy.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/pd4d10/lottiefy/issues"
+  }
+}
