@@ -40,6 +40,8 @@ export type Options = {
   layerFilter: (layer: Layer) => boolean
 }
 
+export { getId }
+
 export class LottieRenderer {
   private data: AnimationData
   private containerId: string // Container
@@ -195,7 +197,7 @@ export class LottieRenderer {
   private _applyTransform(id: Id, parentId: Id, startFrame: number) {
     const { width, height, data: layer } = this.layers[id]
     const parentHeight = this.layers[parentId].height
-    this.actions.delayShow(id, this._getTime(layer.st))
+    this.actions.delayShow(id, this._getTime(layer.ip), this._getTime(layer.op))
 
     // Opacity
     const oData = layer.ks.o.k

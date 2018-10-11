@@ -5,6 +5,8 @@ export type Layer = {
   nm: string
   refId: Id
   st: number
+  ip: number
+  op: number
   ks: {
     o: any
     r: any
@@ -88,7 +90,7 @@ export type Actions = {
   /**
    * Show element with delay
    */
-  delayShow(id: Id, timeout: number): void
+  delayShow(id: Id, start: number, end: number): void
 
   /**
    * Set anchor point of an element

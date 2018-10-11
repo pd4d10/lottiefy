@@ -1,10 +1,14 @@
-const { LottieRenderer } = require('lottiefy')
+const { LottieRenderer, getId } = require('lottiefy')
 
 function getPoint({ x, y }) {
   return `cc.p(${x},${y})`
 }
 
-module.exports = function generate({ data, containerId, layerFilter }) {
+module.exports = function generate({
+  animationData,
+  containerId,
+  layerFilter,
+}) {
   let code = `local t = {}`
   const append = str => {
     code += str + '\n'
@@ -16,11 +20,9 @@ module.exports = function generate({ data, containerId, layerFilter }) {
     return `cc.c4f(${r}, ${g}, ${b}, ${a})`
   }
   const renderer = new LottieRenderer({
-    data,
+    animationData,
     reverseY: true,
-    // generateId = nm => {
-    //   return (nm || 'v') + '_' + v4().replace(/-/g, '_') // for lua variables
-    // },
+    generateId: layer => (layer.nm || 'v') + '_' + getId(), // for lua variables
     containerId,
     layerFilter,
     actions: {
@@ -28,8 +30,9 @@ module.exports = function generate({ data, containerId, layerFilter }) {
         append(`t['${id}'] = cc.Layer:create()`)
         append(`t['${id}']:setContentSize(${width}, ${height})`)
       },
-      createImage(id, { path, name }) {
+      createImage(id, { path, name, width, height }) {
         append(`t['${id}'] = display.newSprite("#${name}")`)
+        append(`t['${id}']:setContentSize(${width}, ${height})`)
       },
       show(id) {
         append(`t['${id}']:setVisible(true)`)
@@ -37,10 +40,12 @@ module.exports = function generate({ data, containerId, layerFilter }) {
       hide(id) {
         append(`t['${id}']:setVisible(false)`)
       },
-      delayShow(id, delay) {
+      delayShow(id, start, end) {
         const sequenceActions = [
-          `cc.DelayTime:create(${delay})`,
+          `cc.DelayTime:create(${start})`,
           `cc.Show:create()`,
+          `cc.DelayTime:create(${end - start})`,
+          `cc.Hide:create()`,
         ]
         append(
           `table.insert(data, {node=t['${id}'],action=cc.Sequence:create({
@@ -107,10 +112,8 @@ module.exports = function generate({ data, containerId, layerFilter }) {
           })})`,
         )
       },
-      setContentSize(id, { width, height }) {
-        append(`t['${id}']:setContentSize(${width}, ${height})`)
-      },
       setAnchor(id, { rx, ry }) {
+        // if (isNaN(rx)) return
         append(`t['${id}']:ignoreAnchorPointForPosition(false)
       t['${id}']:setAnchorPoint(cc.p(${rx}, ${ry}))`)
       },
