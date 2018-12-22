@@ -1,0 +1,12 @@
+{
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "sourceMap": true,
+    "outDir": "./lib",
+    "strict": true,
+    "esModuleInterop": true,
+    "declaration": true
+  }
+}

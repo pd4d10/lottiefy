@@ -35,7 +35,7 @@
     "lottiefy": "^0.0.4"
   },
   "devDependencies": {
-    "rollup": "^0.62.0",
+    "rollup": "^0.66.6",
     "rollup-plugin-license": "^0.6.0",
     "rollup-plugin-uglify": "^4.0.0"
   }

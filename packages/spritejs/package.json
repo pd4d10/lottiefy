@@ -22,5 +22,8 @@
   },
   "bugs": {
     "url": "https://github.com/pd4d10/lottiefy/issues"
+  },
+  "devDependencies": {
+    "rollup": "^0.66.6"
   }
 }

@@ -12,6 +12,7 @@ const licensePlugin = license({
  * Released under the MIT License
  */`,
 })
+
 const commonPlugins = [
   nodeResolve(),
   commonjs(),

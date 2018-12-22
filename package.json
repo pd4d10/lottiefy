@@ -1,25 +1,11 @@
 {
-  "name": "lottiefy",
-  "version": "0.0.4",
-  "description": "Customize Lottie renderer",
-  "main": "lib",
-  "files": [
-    "lib",
-    "dist"
-  ],
-  "scripts": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pd4d10/lottiefy.git"
-  },
-  "keywords": [],
-  "author": "Rongjian Zhang <pd4d10@gmail.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/pd4d10/lottiefy/issues"
-  },
-  "homepage": "https://github.com/pd4d10/lottiefy",
+  "name": "root",
+  "private": true,
   "devDependencies": {
-    "lerna": "^3.4.0"
+    "lerna": "^3.4.0",
+    "rollup": "^0.66.6",
+    "rollup-plugin-license": "^0.7.0",
+    "rollup-plugin-uglify": "^6.0.0",
+    "typescript": "^3.1.3"
   }
 }
